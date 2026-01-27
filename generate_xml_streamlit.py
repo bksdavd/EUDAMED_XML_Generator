@@ -33,13 +33,27 @@ def get_enums_for_type(type_obj):
              enums = type_obj.base_type.enumeration
     return [str(e) for e in enums] if enums else None
 
-def render_input_fields(element, type_obj, parent_key, state_container):
+def get_type_constraints_help(type_obj):
+    """Generate a help string for type constraints."""
+    constraints = []
+    if hasattr(type_obj, 'min_length') and type_obj.min_length is not None:
+        constraints.append(f"Min Length: {type_obj.min_length}")
+    if hasattr(type_obj, 'max_length') and type_obj.max_length is not None:
+        constraints.append(f"Max Length: {type_obj.max_length}")
+    if hasattr(type_obj, 'patterns') and type_obj.patterns:
+         constraints.append(f"Pattern required")
+    
+    return " | ".join(constraints) if constraints else ""
+
+def render_input_fields(element, type_obj, parent_key, state_container, xml_path=""):
     """
     Recursively renders input fields for an element.
     Returns the value entered/selected by the user.
     """
     indent_level = len(parent_key.split(".")) if parent_key else 0
     key = f"{parent_key}.{element.name}" if parent_key else element.name
+    
+    current_path = f"{xml_path}/{element.local_name}" if xml_path else element.local_name
     
     # Store the structure in session state to rebuild XML later
     if 'xml_structure' not in state_container:
@@ -49,35 +63,113 @@ def render_input_fields(element, type_obj, parent_key, state_container):
         enums = get_enums_for_type(type_obj)
         label = f"{element.local_name}"
         
-        help_text = f"Namespace: {element.name}"
+        # Display XML Path
+        st.caption(f"📍 Path: `{current_path}`")
         
+        # Build help text
+        help_text = f"Namespace: {element.name}"
+        constraint_text = get_type_constraints_help(type_obj)
+        if constraint_text:
+            help_text += f"\nConstraints: {constraint_text}"
+        
+        val = None
         if enums:
             val = st.selectbox(label, options=enums, key=key, help=help_text)
+        elif hasattr(type_obj, 'primitive_type') and type_obj.primitive_type and type_obj.primitive_type.local_name == 'boolean':
+             # Handle Boolean
+             bool_val = st.toggle(label, key=key, help=help_text)
+             val = "true" if bool_val else "false"
         else:
-            val = st.text_input(label, key=key, help=help_text)
-            
+            # Check for max length for the input widget
+            max_chars = None
+            if hasattr(type_obj, 'max_length') and type_obj.max_length is not None:
+                max_chars = int(type_obj.max_length)
+                
+            val = st.text_input(label, key=key, help=help_text, max_chars=max_chars)
+        
+        # Validation Logic
+        if val:
+            # Use xmlschema's own validation to check the value
+            try:
+                type_obj.validate(val)
+            except xmlschema.XMLSchemaValidationError as e:
+                st.error(f"❌ Invalid format: {e.reason}")
+            except Exception as e:
+                st.error(f"❌ Invalid value")
+
         return val
 
     elif type_obj.is_complex():
         st.markdown(f"**{element.local_name}**")
+        st.caption(f"Path: `{current_path}`")
         
         group = type_obj.content
         if not group: 
             return None
 
         children_data = {}
-        # Iterate over elements in the sequence/group
-        for particle in group.iter_model():
-            if not isinstance(particle, xmlschema.validators.XsdElement):
-                continue
+        
+        # Helper to process model groups (Sequence/Choice)
+        def process_group(group_particle, parent_key, current_path, indent_level):
+             group_data = {}
+             
+             # If it's a Choice with minOccurs >= 1, we must force a made selection
+             if group_particle.model == 'choice' and group_particle.min_occurs >= 1:
+                 # Get options
+                 options = [p for p in group_particle.iter_model()]
+                 # Create labels for options (using local_name if element, else 'Group')
+                 option_labels = []
+                 for opt in options:
+                     if isinstance(opt, xmlschema.validators.XsdElement):
+                         option_labels.append(opt.local_name)
+                     else:
+                         option_labels.append("Nested Group") # Simplified for now
+                 
+                 # Unique key for this choice
+                 choice_key = f"{parent_key}_choice_{id(group_particle)}"
+                 
+                 st.markdown(f"{'  ' * indent_level}*Choose one required option:*")
+                 selected_label = st.radio("Select type:", option_labels, key=choice_key, horizontal=True, label_visibility="collapsed")
+                 
+                 # Find selected particle
+                 selected_particle = None
+                 for opt in options:
+                     if isinstance(opt, xmlschema.validators.XsdElement) and opt.local_name == selected_label:
+                         selected_particle = opt
+                         break
+                 
+                 if selected_particle:
+                      # Process the selected branch
+                      if isinstance(selected_particle, xmlschema.validators.XsdElement):
+                           with st.container():
+                                col1, col2 = st.columns([0.5, 9.5])
+                                with col2:
+                                    # Recursive call
+                                    val = render_input_fields(selected_particle, selected_particle.type, parent_key, state_container, current_path)
+                                    group_data[selected_particle.name] = val
+             
+             # If Sequence or Optional Choice (though optional choice usually doesn't force input)
+             else:
+                 for particle in group_particle.iter_model():
+                     if isinstance(particle, xmlschema.validators.XsdElement):
+                         if particle.min_occurs >= 1:
+                            with st.container():
+                                col1, col2 = st.columns([0.5, 9.5])
+                                with col2:
+                                    child_val = render_input_fields(particle, particle.type, parent_key, state_container, current_path)
+                                    group_data[particle.name] = child_val
+                     
+                     elif isinstance(particle, xmlschema.validators.XsdGroup):
+                         if particle.min_occurs >= 1:
+                             # Recurse for nested group
+                             nested_data = process_group(particle, parent_key, current_path, indent_level)
+                             group_data.update(nested_data)
+                             
+             return group_data
 
-            if particle.min_occurs >= 1:
-                with st.container():
-                     # Visual indentation
-                    col1, col2 = st.columns([0.5, 9.5])
-                    with col2:
-                        child_val = render_input_fields(particle, particle.type, key, state_container)
-                        children_data[particle.name] = child_val
+        # Start processing the top-level group
+        # The top level content of a complex type is a Group (usually sequence)
+        children_data = process_group(group, key, current_path, 0)
         
         return children_data
 
@@ -165,34 +257,31 @@ if not basic_udi_def or not udidi_data_def:
 
 # --- UI Layout ---
 
-with st.form("xml_form"):
-    st.header("MDR Basic UDI Configuration")
-    st.info("Fill in the mandatory fields for the Basic UDI. Min Occurs >= 1 fields only.")
-    
-    # We use a distinct key prefix
-    basic_udi_data = render_input_fields(basic_udi_def, basic_udi_def.type, "root", {})
-    
-    st.header("MDR UDI-DI Data Entries")
-    st.info("Fill in the mandatory fields for the UDI-DI. You can add multiple entries.")
-    
-    # Dynamic form for multiple UDI-DIs
-    # Streamlit handling for dynamic add/remove is tricky inside a big form.
-    # We will prioritize a specific number selector for simplicity in this generated version, 
-    # or just one for initial proof of concept, or use session state outside form to manage count.
-    
-    # Since 'st.form' prevents rerun on interactions, let's use a number input for count 
-    # OUTSIDE the form or just put it inside.
-    
-    num_udis = st.number_input("Number of UDI-DI entries", min_value=1, max_value=10, value=1)
-    
-    udidi_data_list = []
-    for i in range(num_udis):
-        st.subheader(f"UDI-DI Entry #{i+1}")
-        # Pass unique parent key
-        udidi_data = render_input_fields(udidi_data_def, udidi_data_def.type, f"root.udidi_{i}", {})
-        udidi_data_list.append(udidi_data)
+st.header("MDR Basic UDI Configuration")
+st.info("Fill in the mandatory fields for the Basic UDI. Min Occurs >= 1 fields only.")
 
-    submitted = st.form_submit_button("Generate XML")
+# We use a distinct key prefix
+basic_udi_path = f"{mdr_device_element.local_name}"
+basic_udi_data = render_input_fields(basic_udi_def, basic_udi_def.type, "root", {}, basic_udi_path)
+
+st.header("MDR UDI-DI Data Entries")
+st.info("Fill in the mandatory fields for the UDI-DI. You can add multiple entries.")
+
+col_count, col_dummy = st.columns([2, 8])
+with col_count:
+     num_udis = st.number_input("Number of UDI-DI entries", min_value=1, max_value=10, value=1)
+
+udidi_data_list = []
+udidi_base_path = f"{mdr_device_element.local_name}"
+for i in range(num_udis):
+    st.subheader(f"UDI-DI Entry #{i+1}")
+    st.markdown("---")
+    # Pass unique parent key
+    udidi_data = render_input_fields(udidi_data_def, udidi_data_def.type, f"root.udidi_{i}", {}, udidi_base_path)
+    udidi_data_list.append(udidi_data)
+
+st.markdown("---")
+submitted = st.button("Generate XML", type="primary")
 
 if submitted:
     st.success("Generating XML...")
