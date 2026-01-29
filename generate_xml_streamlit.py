@@ -45,6 +45,31 @@ def get_type_constraints_help(type_obj):
     
     return " | ".join(constraints) if constraints else ""
 
+def get_documentation(obj):
+    """Extract documentation from an XSD component."""
+    docs = []
+    
+    # helper to extract text safely
+    def extract_text(doc):
+        if isinstance(doc, str):
+            return doc
+        if hasattr(doc, 'text'):
+            return doc.text
+        # Fallback for lxml/ElementTree elements
+        return getattr(doc, 'text', str(doc))
+
+    try:
+        if hasattr(obj, 'annotation') and obj.annotation is not None:
+             if hasattr(obj.annotation, 'documentation') and obj.annotation.documentation:
+                 for doc in obj.annotation.documentation:
+                     txt = extract_text(doc)
+                     if txt:
+                         docs.append(txt.strip())
+    except Exception as e:
+        print(f"Error extracting documentation: {e}")
+        
+    return docs
+
 def render_input_fields(element, type_obj, parent_key, state_container, xml_path=""):
     """
     Recursively renders input fields for an element.
@@ -66,11 +91,27 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
         # Display XML Path
         st.caption(f"📍 Path: `{current_path}`")
         
-        # Build help text
-        help_text = f"Namespace: {element.name}"
+        # Build help text with documentation
+        help_lines = []
+        
+        # 1. Try element annotation
+        element_docs = get_documentation(element)
+        if element_docs:
+            help_lines.extend(element_docs)
+        
+        # 2. Try type annotation if element has none
+        if not element_docs:
+            type_docs = get_documentation(type_obj)
+            if type_docs:
+                help_lines.extend(type_docs)
+
+        help_lines.append(f"Namespace: {element.name}")
+        
         constraint_text = get_type_constraints_help(type_obj)
         if constraint_text:
-            help_text += f"\nConstraints: {constraint_text}"
+            help_lines.append(f"Constraints: {constraint_text}")
+            
+        help_text = "\n\n".join(help_lines)
         
         val = None
         if enums:
@@ -100,7 +141,22 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
         return val
 
     elif type_obj.is_complex():
-        st.markdown(f"**{element.local_name}**")
+        label = f"**{element.local_name}**"
+        
+        # Try to get documentation for complex type
+        c_help_lines = []
+        c_docs = get_documentation(element)
+        if not c_docs:
+             c_docs = get_documentation(type_obj)
+        
+        if c_docs:
+            # We can't put help on markdown, so we render an info box or caption if docs exist
+            st.markdown(label)
+            for d in c_docs:
+                st.caption(f"ℹ️ {d}")
+        else:
+            st.markdown(label)
+            
         st.caption(f"Path: `{current_path}`")
         
         group = type_obj.content
