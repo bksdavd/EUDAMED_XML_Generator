@@ -4,6 +4,9 @@ import xml.etree.ElementTree as ET
 import streamlit as st
 import xmlschema
 import yaml
+import re
+import csv
+import io
 
 # Page configuration
 st.set_page_config(page_title="EUDAMED XML Generator", layout="wide")
@@ -28,6 +31,54 @@ def load_config(product_group):
     except Exception as e:
         st.error(f"Error loading config {filename}: {e}")
         return [], {}
+
+@st.cache_resource
+def load_eudamed_metadata():
+    """Load and cache metadata from EUDAMED CSV files."""
+    metadata = {}
+    all_headers = set()
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_dir = os.path.join(base_dir, 'EUDAMED downloaded')
+    
+    files = ['basic-udi.csv', 'udi-di.csv']
+    
+    for filename in files:
+        path = os.path.join(csv_dir, filename)
+        if os.path.exists(path):
+            try:
+                with open(path, 'r', encoding='utf-8-sig', errors='replace') as f:
+                    # csv.DictReader might struggle if headers have BOM or spaces
+                    # Read first line to clean headers
+                    lines = f.readlines()
+                    if not lines: continue
+                    
+                    # Use csv.reader to correctly parse headers (handles quotes)
+                    header_reader = csv.reader([lines[0]])
+                    raw_headers = next(header_reader)
+                    
+                    # Filter empty headers
+                    headers = [h.strip() for h in raw_headers if h and h.strip()]
+                    all_headers.update(headers)
+                    
+                    # Use the cleaned headers
+                    reader = csv.DictReader(lines[1:], fieldnames=headers)
+                    
+                    for row in reader:
+                        # Find the Field ID (it might be 'Field ID' or 'Field ID ' etc)
+                        # We cleaned headers so it should be 'Field ID'
+                        fld_id = row.get('Field ID')
+                        if fld_id:
+                            metadata[fld_id] = row
+            except Exception as e:
+                st.error(f"Error loading metadata from {filename}: {e}")
+                
+    # Sort headers to ensure consistent order
+    sorted_headers = sorted(list(all_headers))
+    # Make sure Field ID is present if not
+    if 'Field ID' in sorted_headers:
+         sorted_headers.remove('Field ID')
+        
+    return metadata, sorted_headers
 
 @st.cache_resource
 def load_schema():
@@ -91,7 +142,7 @@ def get_documentation(obj):
         
     return docs
 
-def render_input_fields(element, type_obj, parent_key, state_container, xml_path="", config_visible=None, config_defaults=None):
+def render_input_fields(element, type_obj, parent_key, state_container, xml_path="", config_visible=None, config_defaults=None, metadata=None):
     """
     Recursively renders input fields for an element.
     Returns the value entered/selected by the user.
@@ -145,6 +196,26 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
             if type_docs:
                 help_lines.extend(type_docs)
 
+        # Extract FLD codes
+        temp_help_text = "\n".join(help_lines)
+        fld_codes = re.findall(r"#(FLD.*?)#", temp_help_text)
+        
+        # Fetch Metadata
+        meta_info = {}
+        if metadata and fld_codes:
+            for code in fld_codes:
+                if code in metadata:
+                    row = metadata[code]
+                    meta_info[code] = row
+                    # Append info to help lines
+                    help_lines.append(f"--- Metadata for {code} ---")
+                    if row.get('Field Label'):
+                        help_lines.append(f"Label: {row['Field Label']}")
+                    if row.get('Field Description / Notes'):
+                        help_lines.append(f"Description: {row['Field Description / Notes']}")
+                    if row.get('Business Rules'):
+                        help_lines.append(f"Rules: {row['Business Rules']}")
+        
         help_lines.append(f"Namespace: {element.name}")
         
         constraint_text = get_type_constraints_help(type_obj)
@@ -193,6 +264,52 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
                 st.error(f"❌ Invalid format: {e.reason}")
             except Exception as e:
                 st.error(f"❌ Invalid value")
+            
+            # Record data for CSV Export
+            fld_code_str = ", ".join(fld_codes) if fld_codes else ""
+            
+            # Base entry
+            csv_entry = {
+                'XMLPath': current_path,
+                'value': val,
+                'FLD_code': fld_code_str,
+                'tooltip': help_text
+            }
+            
+            # Aggregate all metadata columns
+            # We want to check ALL headers that might exist in the collected rows
+            if meta_info:
+                # Collect all column names found in the matched rows
+                found_keys = set()
+                for row in meta_info.values():
+                    found_keys.update(row.keys())
+                
+                for key in found_keys:
+                    if key is None: continue # Skip 'restkey' or unmatched columns
+                    
+                    values = []
+                    # We iterate over fld_codes to preserve some order or logic?
+                    # Or just iterate over meta_info items?
+                    # The fld_codes list determines which rows are relevant.
+                    for code in fld_codes:
+                        if code in meta_info:
+                            val_part = meta_info[code].get(key, '')
+                            if val_part: 
+                                if isinstance(val_part, list):
+                                    values.append(",".join(map(str, val_part)))
+                                else:
+                                    values.append(str(val_part))
+                    
+                    if values:
+                        # Join multiple values with semi-colon
+                        # Avoid duplicating if same value exists? 
+                        # Let's keep all to see distribution
+                        csv_entry[key] = "; ".join(values)
+            
+            if 'csv_entries' not in state_container:
+                state_container['csv_entries'] = []
+            
+            state_container['csv_entries'].append(csv_entry)
 
         return val
 
@@ -222,7 +339,7 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
         children_data = {}
         
         # Helper to process model groups (Sequence/Choice)
-        def process_group(group_particle, parent_key, current_path, indent_level, cv, cd):
+        def process_group(group_particle, parent_key, current_path, indent_level, cv, cd, md):
              group_data = {}
              
              # If it's a Choice with minOccurs >= 1, we must force a made selection
@@ -264,7 +381,7 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
                                         parent_key, 
                                         state_container, 
                                         current_path,
-                                        cv, cd
+                                        cv, cd, md
                                     )
                                     group_data[selected_particle.name] = val
              
@@ -282,7 +399,7 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
                                         parent_key, 
                                         state_container, 
                                         current_path,
-                                        cv, cd
+                                        cv, cd, md
                                     )
                                     if child_val is not None:
                                         group_data[particle.name] = child_val
@@ -290,14 +407,14 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
                      elif isinstance(particle, xmlschema.validators.XsdGroup):
                          if particle.min_occurs >= 1:
                              # Recurse for nested group
-                             nested_data = process_group(particle, parent_key, current_path, indent_level, cv, cd)
+                             nested_data = process_group(particle, parent_key, current_path, indent_level, cv, cd, md)
                              group_data.update(nested_data)
                              
              return group_data
 
         # Start processing the top-level group
         # The top level content of a complex type is a Group (usually sequence)
-        children_data = process_group(group, key, current_path, 0, config_visible, config_defaults)
+        children_data = process_group(group, key, current_path, 0, config_visible, config_defaults, metadata)
         
         return children_data
 
@@ -343,6 +460,7 @@ def build_xml_element_manual_tag(tag, content):
 # --- Main App ---
 
 schema, error_msg = load_schema()
+metadata_csv, metadata_headers = load_eudamed_metadata()
 
 if not schema:
     st.error(error_msg)
@@ -411,14 +529,19 @@ st.info("Fill in the mandatory fields for the Basic UDI. Min Occurs >= 1 fields 
 basic_udi_path = f"{mdr_device_element.local_name}"
 # Add selected_group to key prefix to ensure widgets refresh when configuration changes
 basic_udi_key_prefix = f"root_{selected_group}"
+
+# Container for collecting data for CSV export
+data_collection_container = {'csv_entries': []}
+
 basic_udi_data = render_input_fields(
     basic_udi_def, 
     basic_udi_def.type, 
     basic_udi_key_prefix, 
-    {}, 
+    data_collection_container, 
     basic_udi_path, 
     config_visible, 
-    config_defaults
+    config_defaults,
+    metadata_csv
 )
 
 st.header("MDR UDI-DI Data Entries")
@@ -439,15 +562,39 @@ for i in range(num_udis):
         udidi_data_def, 
         udidi_data_def.type, 
         group_key_prefix, 
-        {}, 
+        data_collection_container, 
         udidi_base_path,
         config_visible,
-        config_defaults
+        config_defaults,
+        metadata_csv
     )
     udidi_data_list.append(udidi_data)
 
 st.markdown("---")
-submitted = st.button("Generate XML", type="primary")
+# Action Buttons in columns
+col_gen, col_export = st.columns([1, 1])
+
+with col_gen:
+    submitted = st.button("Generate XML", type="primary")
+
+with col_export:
+    # Prepare CSV Data
+    csv_buffer = io.StringIO()
+    
+    # Define fields: Standard + All Metadata Headers (excluding duplicate Field ID)
+    fieldnames = ['XMLPath', 'value', 'FLD_code', 'tooltip'] + metadata_headers
+    
+    writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames, extrasaction='ignore')
+    writer.writeheader()
+    if 'csv_entries' in data_collection_container:
+        writer.writerows(data_collection_container['csv_entries'])
+    
+    st.download_button(
+        label="Export Data to CSV",
+        data=csv_buffer.getvalue(),
+        file_name="eudamed_data_export.csv",
+        mime="text/csv"
+    )
 
 if submitted:
     st.success("Generating XML...")
