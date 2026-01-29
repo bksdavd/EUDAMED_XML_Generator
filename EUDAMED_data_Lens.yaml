@@ -1,0 +1,28 @@
+# Configuration for EUDAMED XML Generation - Product Group: Lens
+# 
+# visible_fields: List of XSD paths that should be displayed to the user.
+# defaults: Key-value pairs of XSD paths and their default values.
+
+visible_fields:
+  - MDRDevice/MDRBasicUDI/riskClass
+  - MDRDevice/MDRBasicUDI/model
+  - MDRDevice/MDRBasicUDI/humanTissuesCells
+  - MDRDevice/MDRBasicUDI/animalTissuesCells
+  - MDRDevice/MDRBasicUDI/MFActorCode
+  - MDRDevice/MDRUDIDIData/identifier/DICode
+  - MDRDevice/MDRUDIDIData/identifier/issuingEntityCode
+  - MDRDevice/MDRUDIDIData/basicUDIIdentifier/DICode
+  - MDRDevice/MDRUDIDIData/basicUDIIdentifier/issuingEntityCode
+
+defaults:
+  MDRDevice/MDRBasicUDI/riskClass: CLASS_IIB
+  MDRDevice/MDRBasicUDI/humanTissuesCells: false
+  MDRDevice/MDRBasicUDI/animalTissuesCells: false
+  MDRDevice/MDRBasicUDI/active: true
+  MDRDevice/MDRBasicUDI/implantable: true
+  MDRDevice/MDRBasicUDI/MFActorCode: BE-MF-000000001
+  MDRDevice/MDRUDIDIData/identifier/issuingEntityCode: GS1
+  MDRDevice/MDRUDIDIData/basicUDIIdentifier/issuingEntityCode: GS1
+  MDRDevice/MDRBasicUDI/identifier/issuingEntityCode: GS1
+  MDRDevice/MDRUDIDIData/status/code: ON_THE_MARKET
+  MDRDevice/MDRUDIDIData/sterile: true

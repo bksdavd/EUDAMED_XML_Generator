@@ -1,0 +1,6 @@
+# Configuration for EUDAMED XML Generation - Product Group: Injector
+visible_fields:
+  # Add visible paths here
+
+defaults:
+  # Add default values here

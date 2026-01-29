@@ -1,0 +1,8 @@
+# Configuration for EUDAMED XML Generation - Product Group: ViscoHA
+visible_fields:
+  - MDRDevice/MDRBasicUDI/riskClass
+  - MDRDevice/MDRBasicUDI/model
+  - MDRDevice/MDRBasicUDI/MFActorCode
+  - MDRDevice/MDRUDIDIData/identifier/DICode
+defaults:
+  MDRDevice/MDRBasicUDI/riskClass: CLASS_III

@@ -3,10 +3,31 @@ import sys
 import xml.etree.ElementTree as ET
 import streamlit as st
 import xmlschema
+import yaml
 
 # Page configuration
 st.set_page_config(page_title="EUDAMED XML Generator", layout="wide")
 st.title("EUDAMED XML Generator")
+
+def load_config(product_group):
+    """Load YAML configuration for the selected product group."""
+    if not product_group:
+        return {}, {}
+        
+    filename = f"EUDAMED_data_{product_group}.yaml"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, filename)
+    
+    if not os.path.exists(file_path):
+        return None, None # Signal missing file
+        
+    try:
+        with open(file_path, 'r') as f:
+            data = yaml.safe_load(f) or {}
+            return data.get('visible_fields', []), data.get('defaults', {})
+    except Exception as e:
+        st.error(f"Error loading config {filename}: {e}")
+        return [], {}
 
 @st.cache_resource
 def load_schema():
@@ -70,7 +91,7 @@ def get_documentation(obj):
         
     return docs
 
-def render_input_fields(element, type_obj, parent_key, state_container, xml_path=""):
+def render_input_fields(element, type_obj, parent_key, state_container, xml_path="", config_visible=None, config_defaults=None):
     """
     Recursively renders input fields for an element.
     Returns the value entered/selected by the user.
@@ -85,6 +106,25 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
         state_container['xml_structure'] = {}
 
     if type_obj.is_simple():
+        # Configuration Visibility Check
+        # True if config is not loaded (None) or if path is in visible list
+        # OR if element is mandatory (min_occurs >= 1)
+        is_mandatory = getattr(element, 'min_occurs', 1) >= 1
+        is_visible = config_visible is None or current_path in config_visible or is_mandatory
+        
+        # Default Value
+        default_val = None
+        if config_defaults:
+            default_val = config_defaults.get(current_path)
+
+        # Logic: If hidden, try to return default, else return None (skip)
+        if not is_visible:
+            if default_val is not None:
+                return str(default_val)
+            # If mandatory (min_occurs >= 1) but hidden and no default -> Warning? Or skip?
+            # We skip it. Validation will catch it later if it was critical.
+            return None
+
         enums = get_enums_for_type(type_obj)
         label = f"{element.local_name}"
         
@@ -115,18 +155,34 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
         
         val = None
         if enums:
-            val = st.selectbox(label, options=enums, key=key, help=help_text)
+            # Handle index for default value in selectbox
+            default_idx = 0
+            if default_val and str(default_val) in enums:
+                default_idx = enums.index(str(default_val))
+                
+            val = st.selectbox(label, options=enums, index=default_idx, key=key, help=help_text)
         elif hasattr(type_obj, 'primitive_type') and type_obj.primitive_type and type_obj.primitive_type.local_name == 'boolean':
              # Handle Boolean
-             bool_val = st.toggle(label, key=key, help=help_text)
+             # Default value check
+             is_checked = False
+             if default_val is not None:
+                 if isinstance(default_val, bool):
+                     is_checked = default_val
+                 elif str(default_val).lower() == 'true':
+                     is_checked = True
+            
+             bool_val = st.toggle(label, value=is_checked, key=key, help=help_text)
              val = "true" if bool_val else "false"
         else:
             # Check for max length for the input widget
             max_chars = None
             if hasattr(type_obj, 'max_length') and type_obj.max_length is not None:
                 max_chars = int(type_obj.max_length)
+             
+            # Default value
+            input_val = str(default_val) if default_val is not None else ""
                 
-            val = st.text_input(label, key=key, help=help_text, max_chars=max_chars)
+            val = st.text_input(label, value=input_val, key=key, help=help_text, max_chars=max_chars)
         
         # Validation Logic
         if val:
@@ -166,7 +222,7 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
         children_data = {}
         
         # Helper to process model groups (Sequence/Choice)
-        def process_group(group_particle, parent_key, current_path, indent_level):
+        def process_group(group_particle, parent_key, current_path, indent_level, cv, cd):
              group_data = {}
              
              # If it's a Choice with minOccurs >= 1, we must force a made selection
@@ -185,6 +241,7 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
                  choice_key = f"{parent_key}_choice_{id(group_particle)}"
                  
                  st.markdown(f"{'  ' * indent_level}*Choose one required option:*")
+                 # Check if we have a default choice in config? Not supported yet.
                  selected_label = st.radio("Select type:", option_labels, key=choice_key, horizontal=True, label_visibility="collapsed")
                  
                  # Find selected particle
@@ -201,7 +258,14 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
                                 col1, col2 = st.columns([0.5, 9.5])
                                 with col2:
                                     # Recursive call
-                                    val = render_input_fields(selected_particle, selected_particle.type, parent_key, state_container, current_path)
+                                    val = render_input_fields(
+                                        selected_particle, 
+                                        selected_particle.type, 
+                                        parent_key, 
+                                        state_container, 
+                                        current_path,
+                                        cv, cd
+                                    )
                                     group_data[selected_particle.name] = val
              
              # If Sequence or Optional Choice (though optional choice usually doesn't force input)
@@ -212,20 +276,28 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
                             with st.container():
                                 col1, col2 = st.columns([0.5, 9.5])
                                 with col2:
-                                    child_val = render_input_fields(particle, particle.type, parent_key, state_container, current_path)
-                                    group_data[particle.name] = child_val
+                                    child_val = render_input_fields(
+                                        particle, 
+                                        particle.type, 
+                                        parent_key, 
+                                        state_container, 
+                                        current_path,
+                                        cv, cd
+                                    )
+                                    if child_val is not None:
+                                        group_data[particle.name] = child_val
                      
                      elif isinstance(particle, xmlschema.validators.XsdGroup):
                          if particle.min_occurs >= 1:
                              # Recurse for nested group
-                             nested_data = process_group(particle, parent_key, current_path, indent_level)
+                             nested_data = process_group(particle, parent_key, current_path, indent_level, cv, cd)
                              group_data.update(nested_data)
                              
              return group_data
 
         # Start processing the top-level group
         # The top level content of a complex type is a Group (usually sequence)
-        children_data = process_group(group, key, current_path, 0)
+        children_data = process_group(group, key, current_path, 0, config_visible, config_defaults)
         
         return children_data
 
@@ -276,6 +348,25 @@ if not schema:
     st.error(error_msg)
     st.stop()
 
+# --- Product Group Selection ---
+st.sidebar.header("Configuration")
+# TODO: Scan directory for available YAML files to make this dynamic
+product_groups = ["Lens", "ViscoHA", "ViscoMC", "Injector", "PILMA", "CTR"] 
+# Default to "Lens" (Index 1 in the list ["None", "Lens", ...])
+default_ix = 1 if "Lens" in product_groups else 0
+selected_group = st.sidebar.selectbox("Select Product Group", ["None"] + product_groups, index=default_ix)
+
+config_visible = None
+config_defaults = None
+
+if selected_group != "None":
+    config_visible, config_defaults = load_config(selected_group)
+    if config_visible or config_defaults:
+        st.sidebar.success(f"Loaded configuration for {selected_group}")
+    else:
+        st.sidebar.warning(f"No specific configuration found for {selected_group}")
+
+
 # Namespace handling
 namespaces = {
     'device': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/v1',
@@ -318,7 +409,17 @@ st.info("Fill in the mandatory fields for the Basic UDI. Min Occurs >= 1 fields 
 
 # We use a distinct key prefix
 basic_udi_path = f"{mdr_device_element.local_name}"
-basic_udi_data = render_input_fields(basic_udi_def, basic_udi_def.type, "root", {}, basic_udi_path)
+# Add selected_group to key prefix to ensure widgets refresh when configuration changes
+basic_udi_key_prefix = f"root_{selected_group}"
+basic_udi_data = render_input_fields(
+    basic_udi_def, 
+    basic_udi_def.type, 
+    basic_udi_key_prefix, 
+    {}, 
+    basic_udi_path, 
+    config_visible, 
+    config_defaults
+)
 
 st.header("MDR UDI-DI Data Entries")
 st.info("Fill in the mandatory fields for the UDI-DI. You can add multiple entries.")
@@ -332,8 +433,17 @@ udidi_base_path = f"{mdr_device_element.local_name}"
 for i in range(num_udis):
     st.subheader(f"UDI-DI Entry #{i+1}")
     st.markdown("---")
-    # Pass unique parent key
-    udidi_data = render_input_fields(udidi_data_def, udidi_data_def.type, f"root.udidi_{i}", {}, udidi_base_path)
+    # Pass unique parent key with group prefix
+    group_key_prefix = f"root_{selected_group}.udidi_{i}"
+    udidi_data = render_input_fields(
+        udidi_data_def, 
+        udidi_data_def.type, 
+        group_key_prefix, 
+        {}, 
+        udidi_base_path,
+        config_visible,
+        config_defaults
+    )
     udidi_data_list.append(udidi_data)
 
 st.markdown("---")
