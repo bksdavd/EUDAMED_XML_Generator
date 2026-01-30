@@ -491,44 +491,66 @@ namespaces = {
     'basicudi': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/BasicUDI/v1',
     'udidi': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/UDIDI/v1',
     'commondi': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/CommonDevice/v1',
-    'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
+    'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+    'eudi': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/LegacyDevice/EUDI/v1',
+    'eudididata': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/LegacyDevice/EUDIData/v1'
 }
 for prefix, uri in namespaces.items():
     ET.register_namespace(prefix, uri)
 
-# Find definitions
-mdr_device_element = schema.elements.get('MDRDevice')
+# Device Configuration Type Selection
+device_type_options = {
+    "MDR Device (Regulation)": "MDRDevice",
+    "Legacy Device (MDD/AIMDD)": "MDEUDevice",
+    "IVDR Device": "IVDRDevice",
+    "Legacy IVD": "IVDEUDevice"
+}
+
+st.sidebar.markdown("---")
+# Default to MDR Device
+selected_device_type_label = st.sidebar.selectbox("Select Device Type", list(device_type_options.keys()))
+selected_root_element_name = device_type_options[selected_device_type_label]
+
+# Find root definition
+mdr_device_element = schema.elements.get(selected_root_element_name)
 if not mdr_device_element:
-    mdr_device_element = schema.elements.get(f"{{{namespaces['device']}}}MDRDevice")
+    mdr_device_element = schema.elements.get(f"{{{namespaces['device']}}}{selected_root_element_name}")
 
 if not mdr_device_element:
-    st.error("Could not find MDRDevice element definition in schema.")
+    st.error(f"Could not find {selected_root_element_name} element definition in schema.")
     st.stop()
 
 mdr_device_type = mdr_device_element.type
 basic_udi_def = None
 udidi_data_def = None
 
+# Logic to find the Basic UDI and UDI-DI Data parts based on naming conventions
+# MDR: MDRBasicUDI, MDRUDIDIData
+# Legacy: MDEUDI, MDEUData
+# IVDR: IVDRBasicUDI, IVDRUDIDIData
+# Legacy IVD: IVDEUDI, IVDEUData
+
 for particle in mdr_device_type.content.iter_model():
-    if 'MDRBasicUDI' in particle.name:
+    name = particle.name
+    if 'BasicUDI' in name or 'EUDI' in name:
         basic_udi_def = particle
-    elif 'MDRUDIDIData' in particle.name:
+    elif 'UDIDIData' in name or 'EUData' in name:
         udidi_data_def = particle
 
 if not basic_udi_def or not udidi_data_def:
-    st.error("Structure mismatch: Could not find MDRBasicUDI or MDRUDIDIData definitions.")
+    st.error(f"Structure mismatch for {selected_root_element_name}: Could not find Basic UDI or Data definitions.")
     st.stop()
 
 
 # --- UI Layout ---
 
-st.header("MDR Basic UDI Configuration")
+st.header(f"{selected_device_type_label} Configuration")
 st.info("Fill in the mandatory fields for the Basic UDI. Min Occurs >= 1 fields only.")
 
 # We use a distinct key prefix
 basic_udi_path = f"{mdr_device_element.local_name}"
 # Add selected_group to key prefix to ensure widgets refresh when configuration changes
-basic_udi_key_prefix = f"root_{selected_group}"
+basic_udi_key_prefix = f"root_{selected_group}_{selected_root_element_name}"
 
 # Container for collecting data for CSV export
 data_collection_container = {'csv_entries': []}
@@ -544,12 +566,20 @@ basic_udi_data = render_input_fields(
     metadata_csv
 )
 
-st.header("MDR UDI-DI Data Entries")
+st.header(f"{selected_device_type_label} Data Entries")
 st.info("Fill in the mandatory fields for the UDI-DI. You can add multiple entries.")
 
-col_count, col_dummy = st.columns([2, 8])
-with col_count:
-     num_udis = st.number_input("Number of UDI-DI entries", min_value=1, max_value=10, value=1)
+# Determins if multiple UDI-DIs are allowed (maxOccurs > 1 or unbounded)
+max_occurs = getattr(udidi_data_def, 'max_occurs', 1)
+is_multiple_allowed = max_occurs is None or max_occurs > 1
+
+if is_multiple_allowed:
+    col_count, col_dummy = st.columns([2, 8])
+    with col_count:
+        num_udis = st.number_input("Number of UDI-DI entries", min_value=1, max_value=10, value=1)
+else:
+    st.warning("This device type allows only 1 UDI-DI Data entry.")
+    num_udis = 1
 
 udidi_data_list = []
 udidi_base_path = f"{mdr_device_element.local_name}"
@@ -557,7 +587,7 @@ for i in range(num_udis):
     st.subheader(f"UDI-DI Entry #{i+1}")
     st.markdown("---")
     # Pass unique parent key with group prefix
-    group_key_prefix = f"root_{selected_group}.udidi_{i}"
+    group_key_prefix = f"root_{selected_group}_{selected_root_element_name}.udidi_{i}"
     udidi_data = render_input_fields(
         udidi_data_def, 
         udidi_data_def.type, 
