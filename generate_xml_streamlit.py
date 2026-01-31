@@ -176,7 +176,14 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
             # We skip it. Validation will catch it later if it was critical.
             return None
 
+        # Check for List Type (e.g. whitespace separated values)
+        is_list_type = getattr(type_obj, 'is_list', lambda: False)()
+
         enums = get_enums_for_type(type_obj)
+        # If it is a list type, try to get enums from the item type
+        if not enums and is_list_type and hasattr(type_obj, 'item_type'):
+             enums = get_enums_for_type(type_obj.item_type)
+
         label = f"{element.local_name}"
         
         # Display XML Path
@@ -226,12 +233,25 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
         
         val = None
         if enums:
-            # Handle index for default value in selectbox
-            default_idx = 0
-            if default_val and str(default_val) in enums:
-                default_idx = enums.index(str(default_val))
+            if is_list_type:
+                # Handle Multi-Select for List Types
+                default_selections = []
+                if default_val:
+                    # Split string by whitespace to get selected items
+                    default_selections = str(default_val).split()
+                    # Filter valid enums only to prevent errors
+                    default_selections = [x for x in default_selections if x in enums]
                 
-            val = st.selectbox(label, options=enums, index=default_idx, key=key, help=help_text)
+                selected = st.multiselect(label, options=enums, default=default_selections, key=key, help=help_text)
+                # XML List types are space-separated strings
+                val = " ".join(selected) if selected else None
+            else:
+                # Handle index for default value in selectbox
+                default_idx = 0
+                if default_val and str(default_val) in enums:
+                    default_idx = enums.index(str(default_val))
+                    
+                val = st.selectbox(label, options=enums, index=default_idx, key=key, help=help_text)
         elif hasattr(type_obj, 'primitive_type') and type_obj.primitive_type and type_obj.primitive_type.local_name == 'boolean':
              # Handle Boolean
              # Default value check
