@@ -7,6 +7,8 @@ import yaml
 import re
 import csv
 import io
+import uuid
+import datetime
 
 # Page configuration
 st.set_page_config(page_title="EUDAMED XML Generator", layout="wide")
@@ -27,10 +29,10 @@ def load_config(product_group):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = yaml.safe_load(f) or {}
-            return data.get('visible_fields', []), data.get('defaults', {})
+            return data.get('visible_fields', []), data.get('defaults', {}), data.get('envelope_settings', {})
     except Exception as e:
         st.error(f"Error loading config {filename}: {e}")
-        return [], {}
+        return [], {}, {}
 
 @st.cache_resource
 def load_eudamed_metadata():
@@ -579,9 +581,10 @@ selected_group = st.sidebar.selectbox("Select Product Group", ["None"] + product
 
 config_visible = None
 config_defaults = None
+config_envelope = None
 
 if selected_group != "None":
-    config_visible, config_defaults = load_config(selected_group)
+    config_visible, config_defaults, config_envelope = load_config(selected_group)
     if config_visible or config_defaults:
         st.sidebar.success(f"Loaded configuration for {selected_group}")
     else:
@@ -596,7 +599,12 @@ namespaces = {
     'commondi': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/CommonDevice/v1',
     'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
     'eudi': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/LegacyDevice/EUDI/v1',
-    'eudididata': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/LegacyDevice/EUDIData/v1'
+    'eudididata': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/LegacyDevice/EUDIData/v1',
+    'm': 'https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Message/v1',
+    's': 'https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Service/v1',
+    'links': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Links/v1',
+    'lsn': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/LanguageSpecific/v1',
+    'marketinfo': 'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MktInfo/MarketInfo/v1'
 }
 for prefix, uri in namespaces.items():
     ET.register_namespace(prefix, uri)
@@ -732,24 +740,94 @@ with col_export:
 if submitted:
     st.success("Generating XML...")
     
-    # Build Root
-    root = ET.Element(mdr_device_element.name)
+    # Build Device (Payload)
+    # We create the device element which will be the content of the payload
+    # Note: To match sample style, we might need to adjust tags, but we stick to schema element names for now
+    # or follow the user's specific sample structure if strict adherence is required.
+    # The sample uses <device:Device xsi:type="...">. The script uses specific elements like <device:MDRDevice>.
+    # Both are usually valid in XML schema if defined, but we'll stick to what the schema loaded.
+    
+    device_root = ET.Element(mdr_device_element.name)
     
     # 1. Add Basic UDI
-    # basic_udi_data contains the nested dict structure of values
-    # We need to construct the elements. 
-    # The render function returned the data relative to the CHILDREN of 'basic_udi_def'.
-    # We need to wrap it in the basic_udi_def tag itself.
-    
     if basic_udi_data:
         basic_udi_elem = build_xml_element_manual_tag(basic_udi_def.name, basic_udi_data)
-        root.append(basic_udi_elem)
+        device_root.append(basic_udi_elem)
         
     # 2. Add UDI-DIs
     for udi_data in udidi_data_list:
         if udi_data:
              udidi_elem = build_xml_element_manual_tag(udidi_data_def.name, udi_data)
-             root.append(udidi_elem)
+             device_root.append(udidi_elem)
+
+    # 3. Build Envelope
+    
+    # Defaults from config
+    sec_token = ""
+    actor_code = ""
+    party_id = ""
+    if config_envelope:
+        sec_token = config_envelope.get('security_token', '')
+        actor_code = config_envelope.get('actor_code', '')
+        party_id = config_envelope.get('party_id', '')
+
+    m_ns = f"{{{namespaces['m']}}}"
+    s_ns = f"{{{namespaces['s']}}}"
+    
+    # Root Push Element
+    root = ET.Element(f"{m_ns}Push")
+    # Add Schema Location manually if needed or via attribute logic
+    
+    # <m:conversationID>
+    conv_id = ET.SubElement(root, f"{m_ns}conversationID")
+    conv_id.text = str(uuid.uuid4())
+    
+    # <m:correlationID>
+    corr_id = ET.SubElement(root, f"{m_ns}correlationID")
+    corr_id.text = str(uuid.uuid4())
+    
+    # <m:creationDateTime>
+    create_dt = ET.SubElement(root, f"{m_ns}creationDateTime")
+    # Z-formatted time
+    create_dt.text = datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00', 'Z')
+    
+    # <m:messageID>
+    msg_id = ET.SubElement(root, f"{m_ns}messageID")
+    msg_id.text = str(uuid.uuid4())
+    
+    # <m:recipient>
+    recipient = ET.SubElement(root, f"{m_ns}recipient")
+    node = ET.SubElement(recipient, f"{m_ns}node")
+    node_actor = ET.SubElement(node, f"{s_ns}nodeActorCode")
+    node_actor.text = "EUDAMED"
+    node_id = ET.SubElement(node, f"{s_ns}nodeID")
+    node_id.text = "eDelivery:EUDAMED"
+    
+    service = ET.SubElement(recipient, f"{m_ns}service")
+    svc_token = ET.SubElement(service, f"{s_ns}serviceAccessToken")
+    svc_token.text = sec_token
+    svc_id = ET.SubElement(service, f"{s_ns}serviceID")
+    svc_id.text = "DEVICE"
+    svc_op = ET.SubElement(service, f"{s_ns}serviceOperation")
+    svc_op.text = "POST"
+    
+    # <m:payload>
+    payload = ET.SubElement(root, f"{m_ns}payload")
+    payload.append(device_root)
+    
+    # <m:sender>
+    sender = ET.SubElement(root, f"{m_ns}sender")
+    s_node = ET.SubElement(sender, f"{m_ns}node")
+    s_node_actor = ET.SubElement(s_node, f"{s_ns}nodeActorCode")
+    s_node_actor.text = actor_code
+    s_node_id = ET.SubElement(s_node, f"{s_ns}nodeID")
+    s_node_id.text = party_id
+    
+    s_service = ET.SubElement(sender, f"{m_ns}service")
+    s_site_id = ET.SubElement(s_service, f"{s_ns}serviceID")
+    s_site_id.text = "DEVICE"
+    s_svc_op = ET.SubElement(s_service, f"{s_ns}serviceOperation")
+    s_svc_op.text = "POST"
 
     # Generate String
     # Note: ElementTree doesn't support pretty printing natively well in older versions, 
@@ -759,27 +837,41 @@ if submitted:
     # Add header manually as ET may omit it or make it simple
     final_xml = '<?xml version="1.0" encoding="utf-8"?>\n' + xml_str
     
-    st.text_area("Generated XML", value=final_xml, height=400)
+    st.text_area("Generated XML", value=final_xml, height=600)
     
-    # Validation
-    st.subheader("Validation")
+    # Validation logic update
+    # Note: Validating the Full Envelope requires the Message XSD, not just the Device XSD.
+    # The current schema loaded is 'DI.xsd' (Device).
+    # Validating the generated Envelope against DI.xsd will FAIL because root is Push, not Device.
+    # We should extract the payload for validation against the currently loaded schema, 
+    # OR warn the user that we are validating only the inner payload.
     
-    # Save to temp file for validation
-    temp_filename = "generated_eudamed_streamlit.xml"
-    with open(temp_filename, "w", encoding="utf-8") as f:
+    st.subheader("Validation (Payload Only)")
+    
+    # Save full envelope
+    full_filename = "generated_eudamed_envelope.xml"
+    with open(full_filename, "w", encoding="utf-8") as f:
         f.write(final_xml)
-        
+
+    # Validate Payload Only
+    # Extract inner device XML for validation
+    payload_xml_str = ET.tostring(device_root, encoding="utf-8", method="xml").decode("utf-8")
+    payload_filename = "generated_eudamed_payload.xml"
+    with open(payload_filename, "w", encoding="utf-8") as f:
+         f.write('<?xml version="1.0" encoding="utf-8"?>\n' + payload_xml_str)
+
     try:
-        schema.validate(temp_filename)
-        st.success("✅ Validation Successful! The XML is valid against the schema.")
+        schema.validate(payload_filename)
+        st.success("✅ Payload Validation Successful! The Device XML is valid against the schema.")
         
-        with open(temp_filename, "rb") as f:
+        # Download Button for the Full Envelope
+        with open(full_filename, "rb") as f:
             st.download_button(
-                label="Download XML",
+                label="Download Full XML Envelope",
                 data=f,
-                file_name="eudamed_device.xml",
+                file_name="eudamed_submission.xml",
                 mime="application/xml"
             )
             
     except xmlschema.XMLSchemaValidationError as e:
-        st.error(f"❌ Validation Failed:\n{e}")
+        st.error(f"❌ Payload Validation Failed:\n{e}")

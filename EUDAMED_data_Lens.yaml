@@ -74,3 +74,8 @@ defaults:
   MDRDevice/MDRBasicUDI/identifier/issuingEntityCode: GS1
   MDRDevice/MDRUDIDIData/status/code: ON_THE_MARKET
   MDRDevice/MDRUDIDIData/sterile: true
+
+envelope_settings:
+  security_token: "YOUR_SECURITY_TOKEN"
+  actor_code: "YOUR_ACTOR_CODE"
+  party_id: "YOUR_PARTY_ID"
