@@ -1,6 +1,7 @@
 [theme]
 primaryColor = "#0078D7"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F0F6FF"
-textColor = "#000000"
+# Removed hardcoded backgrounds to allow Streamlit's native Dark Mode to work
+# backgroundColor = "#FFFFFF" 
+# secondaryBackgroundColor = "#F0F6FF"
+# textColor = "#000000"
 font = "sans serif"

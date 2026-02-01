@@ -10,6 +10,10 @@ import csv
 import io
 import uuid
 import datetime
+from openpyxl import Workbook
+from openpyxl.worksheet.table import Table, TableStyleInfo
+from openpyxl.styles import Alignment
+from openpyxl.utils import get_column_letter
 
 # Page configuration
 st.set_page_config(page_title="EUDAMED XML Generator", layout="wide")
@@ -784,22 +788,91 @@ with col_gen:
     submitted = st.button("Generate XML", type="primary")
 
 with col_export:
-    # Prepare CSV Data
-    csv_buffer = io.StringIO()
-    
-    # Define fields: Standard + All Metadata Headers (excluding duplicate Field ID)
-    fieldnames = ['XMLPath', 'value', 'FLD_code', 'tooltip'] + metadata_headers
-    
-    writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames, extrasaction='ignore')
-    writer.writeheader()
+    # Prepare Excel Data
+    excel_buffer = io.BytesIO()
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "EUDAMED Data"
+
+    # Define fields configuration
+    # Renaming map
+    rename_map = {
+        "Field applicable for MDR": "Field for MDR",
+        "Field applicable for IVDR": "Field for IVDR"
+    }
+
+    # Process headers with renaming
+    processed_metadata_headers = [rename_map.get(h, h) for h in metadata_headers]
+    headers = ['XMLPath', 'value', 'FLD_code', 'tooltip'] + processed_metadata_headers
+    ws.append(headers)
+
+    # Write data
     if 'csv_entries' in data_collection_container:
-        writer.writerows(data_collection_container['csv_entries'])
+        for entry in data_collection_container['csv_entries']:
+            row = []
+            # We must map the keys correctly. The entry dict uses original keys from metadata_headers
+            # But our headers list has renamed values.
+            # We need to construct the row using the original keys sequence
+            
+            # 1. XMLPath
+            row.append(entry.get('XMLPath', ""))
+            # 2. value
+            row.append(entry.get('value', ""))
+            # 3. FLD_code
+            row.append(entry.get('FLD_code', ""))
+            # 4. tooltip
+            row.append(entry.get('tooltip', ""))
+            
+            # 5. Metadata fields (iterate original metadata_headers to fetch data)
+            for meta_header in metadata_headers:
+                 row.append(entry.get(meta_header, ""))
+            
+            ws.append(row)
+
+    # Create Table
+    last_col_letter = get_column_letter(len(headers))
+    last_row = ws.max_row
     
+    if last_row > 1: # Only create table if data exists (row 1 is header)
+        tab = Table(displayName="EudamedData", ref=f"A1:{last_col_letter}{last_row}")
+        # Use TableStyleMedium16 (Blue-ish in some themes, or Neutral) as requested
+        # Disable column stripes ("Make columns not banded")
+        style = TableStyleInfo(name="TableStyleMedium16", showFirstColumn=False,
+                               showLastColumn=False, showRowStripes=True, showColumnStripes=False)
+        tab.tableStyleInfo = style
+        ws.add_table(tab)
+
+    # Apply Shrink to Fit
+    shrink_alignment = Alignment(shrink_to_fit=True, wrap_text=False)
+    for row in ws.iter_rows():
+        for cell in row:
+            cell.alignment = shrink_alignment
+            
+    # Set column widths based on header titles
+    for i, header in enumerate(headers, start=1):
+        col_letter = get_column_letter(i)
+        if i == 1: 
+            # Column A (XMLPath): Fixed width ~7.5 cm (approx 41 character units - 1.5x of 27)
+            ws.column_dimensions[col_letter].width = 41
+        elif i == 2:
+            # Column B (value): 2x wider than standard title fit
+            # Header is 'value' (len 5). Standard would be 10. 2x is 20.
+            # But 'value' data is usually long, so maybe 2x of a standard width?
+            # Let's assume standard width derived from header length
+            base_width = len(str(header)) + 5
+            ws.column_dimensions[col_letter].width = base_width * 2
+        else:
+            # Other columns: Width based on header title length + padding for filter button
+            ws.column_dimensions[col_letter].width = len(str(header)) + 5
+
+    wb.save(excel_buffer)
+    excel_data = excel_buffer.getvalue()
+
     st.download_button(
-        label="Export Data to CSV",
-        data=csv_buffer.getvalue(),
-        file_name="eudamed_data_export.csv",
-        mime="text/csv"
+        label="Export Data to Excel",
+        data=excel_data,
+        file_name="eudamed_data_export.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
 if submitted:
