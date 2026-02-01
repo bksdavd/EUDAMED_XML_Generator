@@ -15,6 +15,24 @@ import datetime
 st.set_page_config(page_title="EUDAMED XML Generator", layout="wide")
 st.title("EUDAMED XML Generator")
 
+# Custom CSS to darken syntax highlighting green color for better visibility
+st.markdown("""
+<style>
+    /* Darken green for strings/attr-values in syntax highlighting */
+    code span.token.string, code span.token.attr-value {
+        color: #006400 !important; 
+    }
+    /* Darken green for inline code (paths) */
+    code {
+        color: #006400 !important;
+    }
+    /* Prevent code blocks from inheriting the green color as base text color */
+    .stCodeBlock code {
+        color: inherit !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 def load_config(product_group):
     """Load YAML configuration for the selected product group."""
     if not product_group:
@@ -624,6 +642,16 @@ if selected_group != "None":
     config_visible, config_defaults, config_envelope = load_config(selected_group)
     if config_visible or config_defaults:
         st.sidebar.success(f"Loaded configuration for {selected_group}")
+        
+        # Display current YAML in main area
+        filename = f"EUDAMED_data_{selected_group}.yaml"
+        file_path = os.path.join(base_dir, filename)
+        if os.path.exists(file_path):
+             with open(file_path, 'r', encoding='utf-8') as f:
+                 yaml_content = f.read()
+             with st.expander("Current Default Values", expanded=False):
+                 # Use 'properties' or 'text' to avoid red highlighting which can look like errors
+                 st.code(yaml_content, language="properties")
     else:
         st.sidebar.warning(f"No specific configuration found for {selected_group}")
 
