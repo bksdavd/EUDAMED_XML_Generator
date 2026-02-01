@@ -1,6 +1,7 @@
 import os
 import sys
 import xml.etree.ElementTree as ET
+import xml.dom.minidom
 import streamlit as st
 import xmlschema
 import yaml
@@ -605,7 +606,7 @@ if not schema:
 base_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(base_dir, '.streamlit', 'EUDAMED_logo.jpg')
 if os.path.exists(logo_path):
-    st.sidebar.image(logo_path, use_container_width=True)
+    st.sidebar.image(logo_path, width="stretch")
 
 # --- Product Group Selection ---
 st.sidebar.header("Configuration")
@@ -866,13 +867,14 @@ if submitted:
     s_svc_op.text = "POST"
 
     # Generate String
-    # Note: ElementTree doesn't support pretty printing natively well in older versions, 
-    # but valid XML is produced.
-    xml_str = ET.tostring(root, encoding="utf-8", method="xml").decode("utf-8")
+    rough_string = ET.tostring(root, encoding="utf-8")
     
-    # Add header manually as ET may omit it or make it simple
-    final_xml = '<?xml version="1.0" encoding="utf-8"?>\n' + xml_str
-    
+    # Format with minidom
+    reparsed = xml.dom.minidom.parseString(rough_string)
+    # toprettyxml returns bytes if encoding is specified, or str if not. 
+    # EUDAMED prefers UTF-8. 
+    final_xml = reparsed.toprettyxml(indent="  ", encoding="utf-8").decode("utf-8")
+
     st.text_area("Generated XML", value=final_xml, height=600)
     
     # Validation logic update
