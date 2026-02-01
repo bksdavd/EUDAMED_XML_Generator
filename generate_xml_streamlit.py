@@ -875,7 +875,10 @@ if submitted:
     # EUDAMED prefers UTF-8. 
     final_xml = reparsed.toprettyxml(indent="  ", encoding="utf-8").decode("utf-8")
 
-    st.text_area("Generated XML", value=final_xml, height=600)
+    st.subheader("Generated XML")
+    # Use a container with fixed height to allow scrolling and code block for syntax highlighting
+    with st.container(height=600):
+        st.code(final_xml, language="xml")
     
     # Validation logic update
     # Note: Validating the Full Envelope requires the Message XSD, not just the Device XSD.
