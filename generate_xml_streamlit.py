@@ -503,7 +503,7 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
                                  
                                  vals = []
                                  for i in range(count_val):
-                                     with st.expander(f"{particle.local_name} #{i+1}", expanded=True):
+                                     with st.expander(f"{particle.local_name} #{i+1}", expanded=False):
                                          indexed_path = f"{clean_path}[{i}]"
                                          child_val = render_input_fields(
                                             particle, 
@@ -601,6 +601,12 @@ if not schema:
     st.error(error_msg)
     st.stop()
 
+# --- Logo & Configuration ---
+base_dir = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(base_dir, '.streamlit', 'EUDAMED_logo.jpg')
+if os.path.exists(logo_path):
+    st.sidebar.image(logo_path, use_container_width=True)
+
 # --- Product Group Selection ---
 st.sidebar.header("Configuration")
 # TODO: Scan directory for available YAML files to make this dynamic
@@ -686,60 +692,60 @@ if not basic_udi_def or not udidi_data_def:
 # --- UI Layout ---
 
 st.header(f"{selected_device_type_label} Configuration")
-st.info("Fill in the mandatory fields for the Basic UDI. Min Occurs >= 1 fields only.")
+
+# Container for collecting data for CSV export
+data_collection_container = {'csv_entries': []}
 
 # We use a distinct key prefix
 basic_udi_path = f"{mdr_device_element.local_name}"
 # Add selected_group to key prefix to ensure widgets refresh when configuration changes
 basic_udi_key_prefix = f"root_{selected_group}_{selected_root_element_name}"
 
-# Container for collecting data for CSV export
-data_collection_container = {'csv_entries': []}
-
-basic_udi_data = render_input_fields(
-    basic_udi_def, 
-    basic_udi_def.type, 
-    basic_udi_key_prefix, 
-    data_collection_container, 
-    basic_udi_path, 
-    config_visible, 
-    config_defaults,
-    metadata_csv
-)
-
-st.header(f"{selected_device_type_label} Data Entries")
-st.info("Fill in the mandatory fields for the UDI-DI. You can add multiple entries.")
-
-# Determins if multiple UDI-DIs are allowed (maxOccurs > 1 or unbounded)
-max_occurs = getattr(udidi_data_def, 'max_occurs', 1)
-is_multiple_allowed = max_occurs is None or max_occurs > 1
-
-if is_multiple_allowed:
-    col_count, col_dummy = st.columns([2, 8])
-    with col_count:
-        num_udis = st.number_input("Number of UDI-DI entries", min_value=1, max_value=10, value=1)
-else:
-    st.warning("This device type allows only 1 UDI-DI Data entry.")
-    num_udis = 1
-
-udidi_data_list = []
-udidi_base_path = f"{mdr_device_element.local_name}"
-for i in range(num_udis):
-    st.subheader(f"UDI-DI Entry #{i+1}")
-    st.markdown("---")
-    # Pass unique parent key with group prefix
-    group_key_prefix = f"root_{selected_group}_{selected_root_element_name}.udidi_{i}"
-    udidi_data = render_input_fields(
-        udidi_data_def, 
-        udidi_data_def.type, 
-        group_key_prefix, 
+with st.expander("Basic UDI Configuration", expanded=False):
+    st.info("Fill in the mandatory fields for the Basic UDI. Min Occurs >= 1 fields only.")
+    basic_udi_data = render_input_fields(
+        basic_udi_def, 
+        basic_udi_def.type, 
+        basic_udi_key_prefix, 
         data_collection_container, 
-        udidi_base_path,
-        config_visible,
+        basic_udi_path, 
+        config_visible, 
         config_defaults,
         metadata_csv
     )
-    udidi_data_list.append(udidi_data)
+
+with st.expander("UDI-DI Data Entries", expanded=False):
+    st.info("Fill in the mandatory fields for the UDI-DI. You can add multiple entries.")
+
+    # Determins if multiple UDI-DIs are allowed (maxOccurs > 1 or unbounded)
+    max_occurs = getattr(udidi_data_def, 'max_occurs', 1)
+    is_multiple_allowed = max_occurs is None or max_occurs > 1
+
+    if is_multiple_allowed:
+        col_count, col_dummy = st.columns([2, 8])
+        with col_count:
+            num_udis = st.number_input("Number of UDI-DI entries", min_value=1, max_value=10, value=1)
+    else:
+        st.warning("This device type allows only 1 UDI-DI Data entry.")
+        num_udis = 1
+
+    udidi_data_list = []
+    udidi_base_path = f"{mdr_device_element.local_name}"
+    for i in range(num_udis):
+        with st.expander(f"UDI-DI Entry #{i+1}", expanded=False):
+            # Pass unique parent key with group prefix
+            group_key_prefix = f"root_{selected_group}_{selected_root_element_name}.udidi_{i}"
+            udidi_data = render_input_fields(
+                udidi_data_def, 
+                udidi_data_def.type, 
+                group_key_prefix, 
+                data_collection_container, 
+                udidi_base_path,
+                config_visible,
+                config_defaults,
+                metadata_csv
+            )
+            udidi_data_list.append(udidi_data)
 
 st.markdown("---")
 # Action Buttons in columns
