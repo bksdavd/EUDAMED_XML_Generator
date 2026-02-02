@@ -332,10 +332,17 @@ def render_input_fields(element, type_obj, parent_key, state_container, xml_path
             # Record data for CSV Export
             fld_code_str = ", ".join(fld_codes) if fld_codes else ""
             
+            # XSD Occurrences
+            min_o = getattr(element, 'min_occurs', '1')
+            max_o = getattr(element, 'max_occurs', '1')
+            if max_o is None: max_o = "unbounded"
+
             # Base entry
             csv_entry = {
                 'XMLPath': current_path,
                 'value': val,
+                'xsd_min': str(min_o),
+                'xsd_max': str(max_o),
                 'FLD_code': fld_code_str,
                 'tooltip': help_text
             }
@@ -801,32 +808,44 @@ with col_export:
         "Field applicable for IVDR": "Field for IVDR"
     }
 
-    # Process headers with renaming
-    processed_metadata_headers = [rename_map.get(h, h) for h in metadata_headers]
-    headers = ['XMLPath', 'value', 'FLD_code', 'tooltip'] + processed_metadata_headers
+    # Build columns definition list: [(DisplayHeader, DataKey)]
+    final_columns_def = []
+    
+    # 1. XMLPath (Fixed first column)
+    final_columns_def.append(('XMLPath', 'XMLPath'))
+    
+    # Check if "Occurrence" exists in metadata to determine placement
+    has_occurrence = "Occurrence" in metadata_headers
+    
+    # If "Occurrence" is NOT in metadata, we inject XSD cols early for visibility
+    if not has_occurrence:
+         final_columns_def.append( ("XSD MinOccurs", "xsd_min") )
+         final_columns_def.append( ("XSD MaxOccurs", "xsd_max") )
+    
+    # Standard fixed columns
+    final_columns_def.append(('value', 'value'))
+    final_columns_def.append(('FLD_code', 'FLD_code'))
+    final_columns_def.append(('tooltip', 'tooltip'))
+
+    # Metadata columns (with dynamic injection if Occurrence exists)
+    for mh in metadata_headers:
+        display_name = rename_map.get(mh, mh)
+        final_columns_def.append( (display_name, mh) )
+        
+        if mh == "Occurrence":
+             final_columns_def.append( ("XSD MinOccurs", "xsd_min") )
+             final_columns_def.append( ("XSD MaxOccurs", "xsd_max") )
+
+    # Extract headers for Excel
+    headers = [c[0] for c in final_columns_def]
     ws.append(headers)
 
     # Write data
     if 'csv_entries' in data_collection_container:
         for entry in data_collection_container['csv_entries']:
             row = []
-            # We must map the keys correctly. The entry dict uses original keys from metadata_headers
-            # But our headers list has renamed values.
-            # We need to construct the row using the original keys sequence
-            
-            # 1. XMLPath
-            row.append(entry.get('XMLPath', ""))
-            # 2. value
-            row.append(entry.get('value', ""))
-            # 3. FLD_code
-            row.append(entry.get('FLD_code', ""))
-            # 4. tooltip
-            row.append(entry.get('tooltip', ""))
-            
-            # 5. Metadata fields (iterate original metadata_headers to fetch data)
-            for meta_header in metadata_headers:
-                 row.append(entry.get(meta_header, ""))
-            
+            for col_def in final_columns_def:
+                row.append(entry.get(col_def[1], ""))
             ws.append(row)
 
     # Create Table
@@ -851,18 +870,18 @@ with col_export:
     # Set column widths based on header titles
     for i, header in enumerate(headers, start=1):
         col_letter = get_column_letter(i)
-        if i == 1: 
-            # Column A (XMLPath): Fixed width ~7.5 cm (approx 41 character units - 1.5x of 27)
+        
+        if header == 'XMLPath': 
+            # Column A: Fixed width ~7.5 cm (approx 41 chars)
             ws.column_dimensions[col_letter].width = 41
-        elif i == 2:
-            # Column B (value): 2x wider than standard title fit
-            # Header is 'value' (len 5). Standard would be 10. 2x is 20.
-            # But 'value' data is usually long, so maybe 2x of a standard width?
-            # Let's assume standard width derived from header length
+        elif header == 'value':
+            # Column value: 2x wider than standard title fit
             base_width = len(str(header)) + 5
             ws.column_dimensions[col_letter].width = base_width * 2
+        elif header in ['XSD MinOccurs', 'XSD MaxOccurs']:
+            ws.column_dimensions[col_letter].width = 15
         else:
-            # Other columns: Width based on header title length + padding for filter button
+            # Other columns: Width based on header title length + padding
             ws.column_dimensions[col_letter].width = len(str(header)) + 5
 
     wb.save(excel_buffer)
