@@ -639,10 +639,28 @@ if os.path.exists(logo_path):
 
 # --- Product Group Selection ---
 st.sidebar.header("Configuration")
-# TODO: Scan directory for available YAML files to make this dynamic
-product_groups = ["Lens", "ViscoHA", "ViscoMC", "Injector", "PILMA", "CTR"] 
-# Default to "Lens" (Index 1 in the list ["None", "Lens", ...])
-default_ix = 1 if "Lens" in product_groups else 0
+
+# Dynamic scan for YAML configuration files
+product_groups = []
+prefix = "EUDAMED_data_"
+suffix = ".yaml"
+
+try:
+    for f in os.listdir(base_dir):
+        if f.startswith(prefix) and f.endswith(suffix):
+            # Extract group name
+            group_name = f[len(prefix):-len(suffix)]
+            product_groups.append(group_name)
+    product_groups.sort()
+except Exception as e:
+    st.sidebar.error(f"Error scanning for config files: {e}")
+
+# Default to "Lens" if available, otherwise "None" (index 0)
+default_target = "Lens"
+default_ix = 0
+if default_target in product_groups:
+    default_ix = product_groups.index(default_target) + 1
+
 selected_group = st.sidebar.selectbox("Select Product Group", ["None"] + product_groups, index=default_ix)
 
 config_visible = None
