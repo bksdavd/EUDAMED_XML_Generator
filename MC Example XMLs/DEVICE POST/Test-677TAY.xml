@@ -9,14 +9,12 @@
     xmlns:ns2="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Service/v1"
     xmlns:udidi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/UDIDI/v1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0.25" xsi:schemaLocation="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Message/v1 https://webgate.ec.europa.eu/tools/eudamed/dtx/service/Message.xsd">
-    <m:conversationID>90b65e3a-332e-436b-b7b5-2669789eb2b0</m:conversationID>
     <m:correlationID>00a62751-8a28-487f-9385-d0e9b834979e</m:correlationID>
     <m:creationDateTime>2026-02-07T21:56:02.349816Z</m:creationDateTime>
     <m:messageID>2b4d34cf-5d74-44af-a34f-0e9c547ba338</m:messageID>
     <m:recipient>
         <m:node>
             <ns2:nodeActorCode>EUDAMED</ns2:nodeActorCode>
-            <ns2:nodeID>eDelivery:EUDAMED</ns2:nodeID>
         </m:node>
         <m:service>
             <ns2:serviceID>DEVICE</ns2:serviceID>
@@ -27,25 +25,24 @@
         <device:Device xsi:type="device:MDRDeviceType">
             <device:MDRBasicUDI>
                 <basicudi:riskClass>CLASS_IIB</basicudi:riskClass>
-                <basicudi:modelName>
-                    <commondi:model>Test-677TAY</commondi:model>
-                    <commondi:name>POSTERIOR CHAMBER INTRAOCULAR LENSES, PSEUDOPHAKIC, HYDROPHILIC, NON-PRELOADED</commondi:name>
-                </basicudi:modelName>
+                <basicudi:model>Test-Mini-677TAY</basicudi:model>
                 <basicudi:identifier>
-                    <commondi:DICode>599302877PAYU9</commondi:DICode>
+                    <commondi:DICode>599302677TAXU9</commondi:DICode>
                     <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
                 </basicudi:identifier>
                 <basicudi:animalTissuesCells>false</basicudi:animalTissuesCells>
                 <basicudi:humanTissuesCells>false</basicudi:humanTissuesCells>
                 <basicudi:MFActorCode>HU-MF-000026801</basicudi:MFActorCode>
+                <!-- Mandatory for Class IIa, IIb, III -->
                 <basicudi:deviceCertificateLinks>
                     <links:deviceCertificateLink>
-                        <links:certificateNumber>Test-Cert-001</links:certificateNumber>
+                        <!-- <links:certificateNumber>Test-Cert-001</links:certificateNumber> -->
                         <links:NBActorCode>0483</links:NBActorCode>
                         <links:certificateType>MDR_TYPE_EXAMINATION</links:certificateType>
                     </links:deviceCertificateLink>
                 </basicudi:deviceCertificateLinks>
                 <basicudi:humanProductCheck>false</basicudi:humanProductCheck>
+                <!-- Mandatory for Class IIb Implantable -->
                 <basicudi:IIb_implantable_exceptions>false</basicudi:IIb_implantable_exceptions>
                 <basicudi:medicinalProductCheck>false</basicudi:medicinalProductCheck>
                 <basicudi:type>DEVICE</basicudi:type>
@@ -64,7 +61,7 @@
                     <commondi:code>ON_THE_MARKET</commondi:code>
                 </udidi:status>
                 <udidi:basicUDIIdentifier>
-                    <commondi:DICode>599302877PAYU9</commondi:DICode>
+                    <commondi:DICode>599302677TAXU9</commondi:DICode>
                     <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
                 </udidi:basicUDIIdentifier>
                 <udidi:MDNCodes>P030102090201</udidi:MDNCodes>
@@ -72,13 +69,11 @@
                 <udidi:referenceNumber>05993029999996</udidi:referenceNumber>
                 <udidi:sterile>true</udidi:sterile>
                 <udidi:sterilization>false</udidi:sterilization>
-                <udidi:tradeNames>
-                    <lsn:name>
-                        <lsn:language>ANY</lsn:language>
-                        <lsn:textValue>Bi-Flex Toric</lsn:textValue>
-                    </lsn:name>
-                </udidi:tradeNames>
-                <udidi:website>https://medicontur.com/professionals/documents/eifus</udidi:website>
+                <!-- REMOVED tradeNames (Optional 0..1) -->
+                <!-- REMOVED website (Optional 0..1) -->
+                <!-- REMOVED storageHandlingConditions (Optional 0..1) -->
+                <!-- REMOVED criticalWarnings (Optional 0..1) -->
+                <!-- REMOVED marketInfos (Optional 0..1) -->
                 <udidi:numberOfReuses>0</udidi:numberOfReuses>
                 <udidi:marketInfos>
                     <marketinfo:marketInfo>
@@ -95,7 +90,6 @@
     <m:sender>
         <m:node>
             <ns2:nodeActorCode>HU-MF-000026801</ns2:nodeActorCode>
-            <ns2:nodeID>HU-MF-000026801</ns2:nodeID>
         </m:node>
         <m:service>
             <ns2:serviceID>DEVICE</ns2:serviceID>
