@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<m:Push xmlns:basicudi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/BasicUDI/v1"
+    xmlns:commondi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/CommonDevice/v1"
+    xmlns:device="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/v1"
+    xmlns:links="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Links/v1"
+    xmlns:lsn="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/LanguageSpecific/v1"
+    xmlns:m="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Message/v1"
+    xmlns:marketinfo="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MktInfo/MarketInfo/v1"
+    xmlns:ns2="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Service/v1"
+    xmlns:udidi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/UDIDI/v1"
+    xmlns:e="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/v1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0.25" xsi:schemaLocation="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Message/v1 https://webgate.ec.europa.eu/tools/eudamed/dtx/service/Message.xsd">
+    <m:correlationID>00a62751-8a28-487f-9385-d0e9b834979e</m:correlationID>
+    <m:creationDateTime>2026-02-07T21:56:02.349816Z</m:creationDateTime>
+    <m:messageID>2b4d34cf-5d74-44af-a34f-0e9c547ba338</m:messageID>
+    <m:recipient>
+        <m:node>
+            <ns2:nodeActorCode>EUDAMED</ns2:nodeActorCode>
+        </m:node>
+        <m:service>
+            <ns2:serviceID>BASIC_UDI</ns2:serviceID>
+            <ns2:serviceOperation>PATCH</ns2:serviceOperation>
+        </m:service>
+    </m:recipient>
+    <m:payload>
+        <device:BasicUDI xsi:type="device:MDRBasicUDIType">
+                <e:version>2</e:version>
+                <basicudi:riskClass>CLASS_IIB</basicudi:riskClass>
+                <basicudi:model>Test-Mini-677TAY-Modified</basicudi:model>
+                <basicudi:identifier>
+                    <commondi:DICode>599302677TAXU9</commondi:DICode>
+                    <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
+                </basicudi:identifier>
+                <basicudi:animalTissuesCells>false</basicudi:animalTissuesCells>
+                <basicudi:humanTissuesCells>false</basicudi:humanTissuesCells>
+                <basicudi:MFActorCode>HU-MF-000026801</basicudi:MFActorCode>
+                <!-- Mandatory for Class IIa, IIb, III -->
+                <basicudi:deviceCertificateLinks>
+                    <links:deviceCertificateLink>
+                        <!-- <links:certificateNumber>Test-Cert-001</links:certificateNumber> -->
+                        <links:NBActorCode>0483</links:NBActorCode>
+                        <links:certificateType>MDR_TYPE_EXAMINATION</links:certificateType>
+                    </links:deviceCertificateLink>
+                </basicudi:deviceCertificateLinks>
+                <basicudi:humanProductCheck>false</basicudi:humanProductCheck>
+                <!-- Mandatory for Class IIb Implantable -->
+                <basicudi:IIb_implantable_exceptions>false</basicudi:IIb_implantable_exceptions>
+                <basicudi:medicinalProductCheck>false</basicudi:medicinalProductCheck>
+                <basicudi:type>DEVICE</basicudi:type>
+                <commondi:active>false</commondi:active>
+                <commondi:administeringMedicine>false</commondi:administeringMedicine>
+                <commondi:implantable>true</commondi:implantable>
+                <commondi:measuringFunction>false</commondi:measuringFunction>
+                <commondi:reusable>false</commondi:reusable>
+        </device:BasicUDI>
+    </m:payload>
+    <m:sender>
+        <m:node>
+            <ns2:nodeActorCode>HU-MF-000026801</ns2:nodeActorCode>
+        </m:node>
+        <m:service>
+            <ns2:serviceID>BASIC_UDI</ns2:serviceID>
+            <ns2:serviceOperation>PATCH</ns2:serviceOperation>
+        </m:service>
+    </m:sender>
+</m:Push>

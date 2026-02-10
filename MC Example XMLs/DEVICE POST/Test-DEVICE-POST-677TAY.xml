@@ -27,7 +27,7 @@
                 <basicudi:riskClass>CLASS_IIB</basicudi:riskClass>
                 <basicudi:model>Test-Mini-677TAY</basicudi:model>
                 <basicudi:identifier>
-                    <commondi:DICode>599302677TAXU9</commondi:DICode>
+                    <commondi:DICode>599302677TAVU9</commondi:DICode>
                     <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
                 </basicudi:identifier>
                 <basicudi:animalTissuesCells>false</basicudi:animalTissuesCells>
@@ -61,7 +61,7 @@
                     <commondi:code>ON_THE_MARKET</commondi:code>
                 </udidi:status>
                 <udidi:basicUDIIdentifier>
-                    <commondi:DICode>599302677TAXU9</commondi:DICode>
+                    <commondi:DICode>599302677TAVU9</commondi:DICode>
                     <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
                 </udidi:basicUDIIdentifier>
                 <udidi:MDNCodes>P030102090201</udidi:MDNCodes>

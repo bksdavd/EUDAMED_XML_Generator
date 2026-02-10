@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='utf-8'?>
+<m:Push xmlns:basicudi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/BasicUDI/v1" xmlns:commondi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/CommonDevice/v1" xmlns:device="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/v1" xmlns:links="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Links/v1" xmlns:m="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Message/v1" xmlns:marketinfo="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MktInfo/MarketInfo/v1" xmlns:ns2="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Service/v1" xmlns:udidi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/UDIDI/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0.25" xsi:schemaLocation="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Message/v1 https://webgate.ec.europa.eu/tools/eudamed/dtx/service/Message.xsd">
+    <m:correlationID>8aabd4c1-e713-4d81-bc91-d0a33f9d55cf</m:correlationID>
+    <m:creationDateTime>2026-02-08T17:36:19.788139Z</m:creationDateTime>
+    <m:messageID>dd32dd5a-dc65-40fe-8d95-9d82baf486b4</m:messageID>
+    <m:recipient>
+        <m:node>
+            <ns2:nodeActorCode>EUDAMED</ns2:nodeActorCode>
+        </m:node>
+        <m:service>
+            <ns2:serviceID>UDI_DI</ns2:serviceID>
+            <ns2:serviceOperation>POST</ns2:serviceOperation>
+        </m:service>
+    </m:recipient>
+    <m:payload>
+    <device:UDIDIData xsi:type="udidi:MDRUDIDIDataType">
+                <udidi:identifier>
+                    <commondi:DICode>05993020456641</commondi:DICode>
+                    <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
+                </udidi:identifier>
+                <udidi:status>
+                    <commondi:code>ON_THE_MARKET</commondi:code>
+                </udidi:status>
+                <udidi:basicUDIIdentifier>
+                    <commondi:DICode>599302677TAXTZ</commondi:DICode>
+                    <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
+                </udidi:basicUDIIdentifier>
+                <udidi:MDNCodes>P030102090201</udidi:MDNCodes>
+                <udidi:productionIdentifier>BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE</udidi:productionIdentifier>
+                <udidi:referenceNumber>05993020456641</udidi:referenceNumber>
+                <udidi:sterile>true</udidi:sterile>
+                <udidi:sterilization>false</udidi:sterilization>
+                <udidi:numberOfReuses>0</udidi:numberOfReuses>
+                <udidi:marketInfos>
+                    <marketinfo:marketInfo>
+                        <marketinfo:country>HU</marketinfo:country>
+                        <marketinfo:originalPlacedOnTheMarket>true</marketinfo:originalPlacedOnTheMarket>
+                    </marketinfo:marketInfo>
+                </udidi:marketInfos>
+                <udidi:baseQuantity>1</udidi:baseQuantity>
+                <udidi:latex>false</udidi:latex>
+                <udidi:reprocessed>false</udidi:reprocessed>
+    </device:UDIDIData>
+    </m:payload>
+    <m:sender>
+        <m:node>
+            <ns2:nodeActorCode>HU-MF-000026801</ns2:nodeActorCode>
+        </m:node>
+        <m:service>
+            <ns2:serviceID>UDI_DI</ns2:serviceID>
+            <ns2:serviceOperation>POST</ns2:serviceOperation>
+        </m:service>
+    </m:sender>
+</m:Push>
