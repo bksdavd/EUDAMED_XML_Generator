@@ -1194,6 +1194,9 @@ if submitted:
             # https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Message/v1 https://webgate.ec.europa.eu/tools/eudamed/dtx/service/Message.xsd
             root.set(f"{{{namespaces['xsi']}}}schemaLocation", 
                      f"{namespaces['m']} https://webgate.ec.europa.eu/tools/eudamed/dtx/service/Message.xsd")
+
+            # Add version attribute (Required by MessageType)
+            root.set("version", "3.0.25")
             
             # <m:correlationID>
             corr_id = ET.SubElement(root, f"{m_ns}correlationID")
@@ -1252,17 +1255,47 @@ if submitted:
             # Cleanup multiple newlines if any
             final_xml = re.sub(r'\n\s*\n', '\n', final_xml)
 
+            # Validate against schema
+            validation_status = "Unknown"
+            validation_details = ""
+            try:
+                if schema.is_valid(final_xml):
+                    validation_status = "Valid"
+                    validation_details = "✅ XML is valid against the schema."
+                else:
+                    validation_status = "Invalid"
+                    try:
+                        schema.validate(final_xml)
+                    except Exception as e:
+                        validation_details = f"❌ Validation Error: {e}"
+            except Exception as e:
+                 validation_status = "Error"
+                 validation_details = f"⚠️ Validation Process Failed: {e}"
+
             # Generate Filename
             fname = f"EUDAMED_{task['service_id']}_{task['mode']}_{uuid.uuid4().hex[:8]}.xml"
             if sub_task.get('index') is not None and sub_task['type'] == 'UDIDI':
                  fname = f"EUDAMED_{task['service_id']}_{task['mode']}_UDI_{sub_task['index']}_{uuid.uuid4().hex[:8]}.xml"
             
-            created_files.append({'name': fname, 'content': final_xml, 'label': f"{task['service_id']} {task['mode']} ({sub_task['type']})"})
+            created_files.append({
+                'name': fname, 
+                'content': final_xml, 
+                'label': f"{task['service_id']} {task['mode']} ({sub_task['type']})",
+                'validation_status': validation_status,
+                'validation_details': validation_details
+            })
 
     st.subheader("Generated XML Files")
     
     for cfile in created_files:
-        with st.expander(cfile['name'], expanded=True):
+        with st.expander(f"{cfile['name']} ({cfile['validation_status']})", expanded=True):
+             if cfile['validation_status'] == "Valid":
+                 st.success(cfile['validation_details'])
+             elif cfile['validation_status'] == "Invalid":
+                 st.error(cfile['validation_details'])
+             else:
+                 st.warning(cfile['validation_details'])
+                 
              st.code(cfile['content'], language="xml")
              st.download_button(
                 label=f"Download {cfile['name']}",
