@@ -278,8 +278,8 @@ def regenerate_ids(input_file, output_file):
     print(f"New UDI-DI (GTIN): {new_gtin}")
 
 if __name__ == "__main__":
-    input_xml = r"k:\PMO Projects\24_01_E New ERP Introduction\Migration\EUDAMED\MC Example XMLs\DEVICE POST\Test-677TAY_minimal.xml"
-    output_xml = r"k:\PMO Projects\24_01_E New ERP Introduction\Migration\EUDAMED\MC Example XMLs\DEVICE POST\Test-677TAY_minimal_new.xml"
+    input_xml = r"k:\PMO Projects\24_01_E New ERP Introduction\Migration\EUDAMED\MC Example XMLs\DEVICE POST\Test-DEVICE-POST-677TAY.xml"
+    output_xml = r"k:\PMO Projects\24_01_E New ERP Introduction\Migration\EUDAMED\MC Example XMLs\DEVICE POST\Test-DEVICE-POST-677TAY_new.xml"
     
     if os.path.exists(input_xml):
         regenerate_ids(input_xml, output_xml)
