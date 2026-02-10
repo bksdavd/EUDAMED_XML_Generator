@@ -85,9 +85,21 @@
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="ENUM_FSN_REPORT_TYPE">
+        <xs:annotation>
+            <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_FSN_REPORT_TYPE</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:simpleType name="ENUM_FSN_REPORT_TYPE_NEW">
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_FSN_REPORT_TYPE_NEW</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="ENUM_MIR_REPORT_TYPES">
+        <xs:annotation>
+            <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_MIR_REPORT_TYPES</xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
@@ -301,9 +313,9 @@
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
-    <xs:simpleType name="ENUM_MTR_REPORT_TYPE_NEW">
+    <xs:simpleType name="ENUM_MTR_REPORT_TYPE">
         <xs:annotation>
-            <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_MTR_REPORT_TYPE_NEW</xs:documentation>
+            <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_MTR_REPORT_TYPE</xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
@@ -412,8 +424,19 @@
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_COUNTRIES_MDR_LIST</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="SubmitterDetailsType">
+        <xs:complexContent>
+            <xs:extension base="vigbase:AbstractSubmitterDetailsType">
+                <xs:sequence>
+                    <xs:element name="type" type="xs:string"/>
+                    <xs:element name="organisationName" type="xs:string" minOccurs="0"/>
+                    <xs:element name="organisationAddress" type="AddressType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="AddressType">
@@ -627,9 +650,6 @@
     <xs:complexType name="fsca_dev_nomenclature">
         <xs:sequence>
             <xs:element name="deviceNomenclatureCodeSection" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>BR-VGL-014</xs:documentation>
-                </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="deviceNomenclatureCode" type="CUSTOM_EMDN_NOMENCLATURE"/>
@@ -681,25 +701,25 @@
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_NON_EU_COUNTRIES</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="ENUM_FSCA_MF_ACTION_REQUIRED_ORDINAL">
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_FSCA_MF_ACTION_REQUIRED</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="ENUM_FSCA_USER_ACTION_REQUIRED_ORDINAL">
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_FSCA_USER_ACTION_REQUIRED</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="fscaGeneralSubaction">
         <xs:sequence>
@@ -707,9 +727,9 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="fscaSubactionDescription" type="xs:string"/>
-                        <xs:element name="fscaGeneralSubactionToBeFinalisedDate" type="xs:string"/>
+                        <xs:element name="fscaGeneralSubactionToBeFinalisedDate" type="xs:date"/>
                         <xs:element name="fscageneralSubactionProgress" type="xs:string"/>
-                        <xs:element name="fscaGeneralSubactionFinalisedDate" type="xs:string" minOccurs="0"/>
+                        <xs:element name="fscaGeneralSubactionFinalisedDate" type="xs:date" minOccurs="0"/>
                         <xs:element name="fscaSubactionDOC" type="vigbase:DocumentMdrTypeOrdinal" minOccurs="0" maxOccurs="unbounded"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -728,57 +748,57 @@
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_IMDRF_A_TYPE</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="ENUM_IMDRF_B_TYPE_ORDINAL">
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_IMDRF_B_TYPE</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="ENUM_IMDRF_C_TYPE_ORDINAL">
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_IMDRF_C_TYPE</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="ENUM_IMDRF_D_TYPE_ORDINAL">
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_IMDRF_D_TYPE</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="ENUM_IMDRF_E_TYPE_ORDINAL">
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_IMDRF_E_TYPE</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="ENUM_IMDRF_F_TYPE_ORDINAL">
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_IMDRF_F_TYPE</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="ENUM_IMDRF_G_TYPE_ORDINAL">
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_IMDRF_G_TYPE</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="countrySpecificFSCA">
         <xs:sequence>
@@ -835,9 +855,17 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="countrySpecificSubactionDescription" type="xs:string"/>
-                        <xs:element name="countrySpecificfscaSubactionToBeFinalisedDate" type="xs:string"/>
+                        <xs:element name="countrySpecificfscaSubactionToBeFinalisedDate" type="xs:date">
+                            <xs:annotation>
+                                <xs:documentation>RULE-00040</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
                         <xs:element name="countrySpecificFscaSubactionProgress" type="xs:string"/>
-                        <xs:element name="countrySpecificfscaSubactionFinalisedDate" type="xs:string" minOccurs="0"/>
+                        <xs:element name="countrySpecificfscaSubactionFinalisedDate" type="xs:date" minOccurs="0">
+                            <xs:annotation>
+                                <xs:documentation>RULE-00040</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
                         <xs:element name="countrySpecificFscaSubactionDOC" type="vigbase:DocumentMdrTypeOrdinal" minOccurs="0" maxOccurs="unbounded"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -890,7 +918,7 @@
                                 <xs:documentation>* Output only field *</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="fsnCorrectiveActionTerminationDate_child" type="xs:string" minOccurs="0">
+                        <xs:element name="fsnCorrectiveActionTerminationDate_child" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-FSN-003.03, BR-VGL-FSN-003.08, BR-VGL-FSN-003.10</xs:documentation>
                                 <xs:documentation>* Output only field *</xs:documentation>
@@ -1124,8 +1152,8 @@
                                     <xs:element name="affectedLotNo" type="xs:string" minOccurs="0"/>
                                     <xs:element name="affectedSoftwareNo" type="xs:string" minOccurs="0"/>
                                     <xs:element name="affectedFirmwareNo" type="xs:string" minOccurs="0"/>
-                                    <xs:element name="affectedDeviceManufacturingDate" type="xs:string" minOccurs="0"/>
-                                    <xs:element name="affectedDeviceExpiryDate" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="affectedDeviceManufacturingDate" type="xs:date" minOccurs="0"/>
+                                    <xs:element name="affectedDeviceExpiryDate" type="xs:date" minOccurs="0"/>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -1182,13 +1210,13 @@
                                             <xs:documentation>BR-VGL-MIR-027, BR-VGL-MIR-042</xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="implantedDate" type="xs:string" minOccurs="0">
+                                    <xs:element name="implantedDate" type="xs:date" minOccurs="0">
                                         <xs:annotation>
                                             <xs:documentation>BR-VGL-MIR-027, BR-VGL-MIR-042</xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="deviceImplantedStartDate" type="xs:string" minOccurs="0"/>
-                                    <xs:element name="deviceImplantedEndDate" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="deviceImplantedStartDate" type="xs:date" minOccurs="0"/>
+                                    <xs:element name="deviceImplantedEndDate" type="xs:date" minOccurs="0"/>
                                     <xs:element name="implantationDuration" minOccurs="0">
                                         <xs:annotation>
                                             <xs:documentation>BR-VGL-MIR-027, BR-VGL-MIR-042</xs:documentation>
@@ -1216,13 +1244,13 @@
                                             <xs:documentation>BR-VGL-MIR-027, BR-VGL-MIR-042</xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="deviceExplantedDate" type="xs:string" minOccurs="0">
+                                    <xs:element name="deviceExplantedDate" type="xs:date" minOccurs="0">
                                         <xs:annotation>
                                             <xs:documentation>BR-VGL-MIR-027, BR-VGL-MIR-042</xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="deviceExplantedStartDate" type="xs:string" minOccurs="0"/>
-                                    <xs:element name="deviceExplantedEndDate" type="xs:string" minOccurs="0"/>
+                                    <xs:element name="deviceExplantedStartDate" type="xs:date" minOccurs="0"/>
+                                    <xs:element name="deviceExplantedEndDate" type="xs:date" minOccurs="0"/>
                                     <xs:element name="explantFacility" type="xs:string" minOccurs="0">
                                         <xs:annotation>
                                             <xs:documentation>BR-VGL-MIR-027, BR-VGL-MIR-042</xs:documentation>
@@ -1267,9 +1295,9 @@
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_MIR_DEVICE_TYPE</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="new_device_certificate_details">
         <xs:sequence>
@@ -1307,21 +1335,21 @@
         <xs:annotation>
             <xs:documentation>Enumeration location: [Eudamed server address]/vig-data-ws/public/enumerations/ENUM_NON_EEA_COUNTRIES_EXPANDED</xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
+        <xs:simpleContent>
             <xs:extension base="vigbase:stringOrdinal"/>
-        </xs:complexContent>
+        </xs:simpleContent>
     </xs:complexType>
     <xs:complexType name="number_of_similar_incidents">
         <xs:sequence>
             <xs:element name="lbTimePeriodN">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="startDateN" type="xs:string" minOccurs="0">
+                        <xs:element name="startDateN" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-032, BR-VGL-MIR-033</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="endDateN" type="xs:string" minOccurs="0">
+                        <xs:element name="endDateN" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-032, BR-VGL-MIR-033</xs:documentation>
                             </xs:annotation>
@@ -1367,12 +1395,12 @@
                                 <xs:documentation>BR-VGL-MIR-033, BR-VGL-PSR-005.14, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="startDate_N-1" type="xs:string" minOccurs="0">
+                        <xs:element name="startDate_N-1" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-032, BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="endDate_N-1" type="xs:string" minOccurs="0">
+                        <xs:element name="endDate_N-1" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-032, BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
@@ -1418,12 +1446,12 @@
                                 <xs:documentation>BR-VGL-PSR-005.14</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="startDate_N-2" type="xs:string" minOccurs="0">
+                        <xs:element name="startDate_N-2" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-032, BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="endDate_N-2" type="xs:string" minOccurs="0">
+                        <xs:element name="endDate_N-2" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-032, BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
@@ -1469,12 +1497,12 @@
                                 <xs:documentation>BR-VGL-PSR-005.14</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="startDate_N-3" type="xs:string" minOccurs="0">
+                        <xs:element name="startDate_N-3" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-032, BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="endDate_N-3" type="xs:string" minOccurs="0">
+                        <xs:element name="endDate_N-3" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-032, BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
@@ -1644,13 +1672,20 @@
                         <xs:element name="nbNumber" minOccurs="0">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="certificateDetails" type="device_certificate_psr" minOccurs="0">
+                                    <xs:element name="certificateDetails" type="device_certificate_psr" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>BR-CIPS-048, BR-VGL-022</xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
                                 </xs:sequence>
                             </xs:complexType>
+                            <xs:key name="certificateDetailsKey-1">
+                                <xs:annotation>
+                                    <xs:documentation>Must be unique relative to this list and constant across different payloads deliveries for the same data it references</xs:documentation>
+                                </xs:annotation>
+                                <xs:selector xpath="vig:certificateDetails"/>
+                                <xs:field xpath="@ordinal"/>
+                            </xs:key>
                         </xs:element>
                     </xs:sequence>
                 </xs:complexType>
@@ -1695,6 +1730,7 @@
                 </xs:complexType>
             </xs:element>
         </xs:sequence>
+        <xs:attribute name="ordinal" type="xs:positiveInteger" use="required"/>
     </xs:complexType>
     <xs:complexType name="psr_dev_nomenclature">
         <xs:sequence>
@@ -1844,12 +1880,12 @@
             <xs:element name="lbTimePeriodN">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="startDateN" type="xs:string">
+                        <xs:element name="startDateN" type="xs:date">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-033</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="endDateN" type="xs:string">
+                        <xs:element name="endDateN" type="xs:date">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-033</xs:documentation>
                             </xs:annotation>
@@ -1885,12 +1921,12 @@
                                 <xs:documentation>BR-VGL-MIR-033, BR-VGL-PSR-005.14, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="startDate_N-1" type="xs:string" minOccurs="0">
+                        <xs:element name="startDate_N-1" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="endDate_N-1" type="xs:string" minOccurs="0">
+                        <xs:element name="endDate_N-1" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-033, BR-VGL-PSR-005.14, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
@@ -1926,12 +1962,12 @@
                                 <xs:documentation>BR-VGL-PSR-005.14</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="startDate_N-2" type="xs:string" minOccurs="0">
+                        <xs:element name="startDate_N-2" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="endDate_N-2" type="xs:string" minOccurs="0">
+                        <xs:element name="endDate_N-2" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
@@ -1967,12 +2003,12 @@
                                 <xs:documentation>BR-VGL-PSR-005.14</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="startDate_N-3" type="xs:string" minOccurs="0">
+                        <xs:element name="startDate_N-3" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="endDate_N-3" type="xs:string" minOccurs="0">
+                        <xs:element name="endDate_N-3" type="xs:date" minOccurs="0">
                             <xs:annotation>
                                 <xs:documentation>BR-VGL-MIR-033, BR-VGL-PSR-005.15</xs:documentation>
                             </xs:annotation>

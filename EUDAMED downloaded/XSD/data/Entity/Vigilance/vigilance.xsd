@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?><?xml-stylesheet type="text/xsl" href="/tools/eudamed/dtx/xslt/index.xsl"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Vigilance" targetNamespace="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Vigilance" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Vigilance" xmlns:vig="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Vigilance" targetNamespace="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Vigilance" elementFormDefault="qualified">
     <xs:simpleType name="SearchConditionEnum">
         <xs:annotation>
             <xs:documentation>The possible values are:</xs:documentation>
@@ -55,21 +55,20 @@
                 </xs:annotation>
             </xs:element>
             <xs:element name="Fields" type="DossierFieldsType"/>
-            <xs:element name="SubmitterDetails" type="SubmitterDetailsType" minOccurs="0"/>
             <xs:element name="ActionDetails" type="DossierActionDetailsType" minOccurs="0"/>
             <xs:element name="Data" type="DataType"/>
         </xs:sequence>
     </xs:group>
-    <xs:complexType name="SubmitterDetailsType">
-        <xs:sequence>
-            <xs:element name="type" type="xs:string"/>
-            <xs:element name="organisationName" type="xs:string" minOccurs="0"/>
-            <xs:element name="organisationAddress" type="AbstractAddressType" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
     <xs:complexType name="stringOrdinal">
         <xs:simpleContent>
             <xs:extension base="xs:string">
+                <xs:attribute name="ordinal" type="xs:positiveInteger" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="dateOrdinal">
+        <xs:simpleContent>
+            <xs:extension base="xs:date">
                 <xs:attribute name="ordinal" type="xs:positiveInteger" use="required"/>
             </xs:extension>
         </xs:simpleContent>
@@ -107,6 +106,7 @@
         <xs:attribute name="version" type="xs:string" use="required"/>
     </xs:complexType>
     <xs:complexType name="ActionDetailsType"/>
+    <xs:complexType name="AbstractSubmitterDetailsType" abstract="true"/>
     <xs:complexType name="AbstractContactMdrType" abstract="true"/>
     <xs:complexType name="AbstractAddressType" abstract="true"/>
     <xs:complexType name="AddressGpsType">

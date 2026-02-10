@@ -301,12 +301,21 @@
         <xs:complexContent>
             <xs:extension base="udidi:DeviceUDIDIDataType">
                 <xs:sequence>
-                    <xs:element name="annexXVINonMedicalDeviceTypes" type="udidi:AnnexXVINonMedicalDeviceTypesType" minOccurs="0" maxOccurs="1">
+                    <xs:element name="annexXVINonMedicalDeviceTypes" type="udidi:AnnexXVINonMedicalDeviceTypesType" minOccurs="0">
                         <xs:annotation>
                             <xs:documentation>
                                 #FLD-UDID-147# - Intended purpose other than medical (Annex XVI).
                                 Field stores the values regarding the Intended purpose of the Device, other the medical, as they are described in the Annex XVI of MDR Regulation.
                                 Field can be provided for Regulation Devices (if applicable) and must not be provided for Legacy Devices.
+                                Not available for a Master UDI-DI
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="annexXVIApplicable" type="xs:boolean" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>
+                                #BR-DTX-UDID-730: Master UDI-DI properties applicability.
+                                Available only for a Master UDI-DI
                             </xs:documentation>
                         </xs:annotation>
                     </xs:element>

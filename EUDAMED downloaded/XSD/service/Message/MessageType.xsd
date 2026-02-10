@@ -43,11 +43,6 @@
 	<xs:import namespace="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Vigilance" schemaLocation="../../data/Entity/Vigilance/vigilance.xsd"/>
 	<xs:import namespace="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/OCM/v1" schemaLocation="../../data/Entity/OldCustomMadeDevice.xsd"/>
 
-	<xs:complexType name="ElementReportsType">
-		<xs:sequence>
-			<xs:element name="elementReport" type="m:ElementReportType" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
 	<xs:complexType name="AcknowledgementType">
 		<xs:annotation>
 			<xs:documentation>This message is to acknowledge the reception / processing of various types of messages. It is sent asynchronously to allow data exchange mechanism to handle the retry mechanism</xs:documentation>
@@ -55,7 +50,7 @@
 		<xs:complexContent>
 			<xs:extension base="m:MessageType">
 				<xs:sequence>
-					<xs:element name="report" type="m:ElementReportsType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="responseEntities" type="m:ResponseEntitiesType" minOccurs="0" maxOccurs="1"/>
 					<xs:element name="responseCode" type="m:ProcessStatusCodeEnum" minOccurs="1" maxOccurs="1"/>
 				</xs:sequence>
 			</xs:extension>
@@ -117,13 +112,29 @@
 			<xs:enumeration value="SERVICE_NOT_FOUND"/>
 		</xs:restriction>
 	</xs:simpleType>
-	<xs:complexType name="ElementReportType">
+	<xs:complexType name="ResponseEntitiesType">
+		<xs:sequence>
+			<xs:element name="responseEntity" type="m:ResponseEntityType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ResponseEntityType">
 		<xs:sequence>
 			<xs:element name="entityCode" type="xs:string" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Represent the natural key of the entity that the current report line refers.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name="responseCode" type="m:ProcessStatusCodeEnum" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="report" type="m:ElementReportsType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ElementReportsType">
+		<xs:sequence>
+			<xs:element name="elementReport" type="m:ElementReportType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ElementReportType">
+		<xs:sequence>
 			<xs:element name="operationErrorCode" type="xs:string" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Error codes are part of a predefined set, related to the business rule it violates.</xs:documentation>
@@ -171,7 +182,7 @@
 			<xs:element name="payload" type="m:CoreEntityPayloadType" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="sender" type="m:EndpointType" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
-		<xs:attribute name="version" use="required" fixed="3.0.22.1" type="xs:string">
+		<xs:attribute name="version" use="required" fixed="3.0.25" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>Version of the XSD model schema against the current entities are validated.</xs:documentation>
 			</xs:annotation>
