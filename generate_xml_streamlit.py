@@ -1205,6 +1205,10 @@ if submitted:
              
         # Normalize columns to lowercase
         df.columns = [c.lower() for c in df.columns]
+        
+        # Add '0' prefix to udi_di if it exists
+        if 'udi_di' in df.columns:
+             df['udi_di'] = "0" + df['udi_di'].astype(str)
              
         # Process Data: Sort by DPT ASC, CYL ASC
         try:
@@ -1301,7 +1305,7 @@ if submitted:
         
         if task['service_id'] == 'DEVICE': # Full Device
              # Single block with Minimum UDI-DI (if IFS) or whatever is in list
-             payload_blocks.append({'type': 'DEVICE', 'budi': basic_udi_data, 'udidis': final_udidi_list})
+             payload_blocks.append({'type': 'DEVICE', 'budi': basic_udi_data, 'udidis': final_udidi_list, 'index': 1, 'total': 1})
              
         elif task['service_id'] == 'UDI_DI': # UDI-DI POST or PATCH
              # Bulk Chunking
@@ -1311,14 +1315,16 @@ if submitted:
              # Create chunks
              if not all_items:
                  # Handle case with no items (empty file? or skip?)
-                 payload_blocks.append({'type': 'UDIDI_BULK', 'items': [], 'index': 0})
+                 payload_blocks.append({'type': 'UDIDI_BULK', 'items': [], 'index': 1, 'total': 1})
              else:
-                 for i in range(0, len(all_items), chunk_size):
+                 chunk_indices = list(range(0, len(all_items), chunk_size))
+                 total_chunks = len(chunk_indices)
+                 for idx, i in enumerate(chunk_indices):
                       chunk = all_items[i:i + chunk_size]
-                      payload_blocks.append({'type': 'UDIDI_BULK', 'items': chunk, 'index': i})
+                      payload_blocks.append({'type': 'UDIDI_BULK', 'items': chunk, 'index': idx + 1, 'total': total_chunks})
                   
         elif task['target'] == 'BasicUDI':
-             payload_blocks.append({'type': 'BasicUDI', 'data': basic_udi_data})
+             payload_blocks.append({'type': 'BasicUDI', 'data': basic_udi_data, 'index': 1, 'total': 1})
 
         # Generate separate file for each block
         for block_idx, block in enumerate(payload_blocks):
@@ -1468,10 +1474,24 @@ if submitted:
                  validation_status = "Error"
                  validation_details = f"⚠️ Validation Process Failed: {e}"
 
-            fname = f"EUDAMED_{task['service_id']}_{task['mode']}_{uuid.uuid4().hex[:8]}.xml"
-            if block.get('index') is not None and block['type'] == 'UDIDI_BULK':
-                 # Add part suffix/index to filename
-                 fname = f"EUDAMED_{task['service_id']}_{task['mode']}_Bulk_Part{block_idx+1}_{uuid.uuid4().hex[:8]}.xml"
+            # Filename generation
+            current_date_str = datetime.datetime.now().strftime("%y%m%d")
+            
+            # Variables for model/pcode
+            model_val = str(ifs_model).strip() if 'ifs_model' in locals() and ifs_model else "NOMODEL"
+            pcode_val = str(ifs_pcode).strip() if 'ifs_pcode' in locals() and ifs_pcode else "NOPCODE"
+
+            # Sanitization
+            model_val = "".join([c for c in model_val if c.isalnum() or c in ('-','_')])
+            pcode_val = "".join([c for c in pcode_val if c.isalnum() or c in ('-','_')])
+
+            base_fname = f"{current_date_str}-{model_val}-{pcode_val}-{task['service_id']}-{task['mode']}"
+            
+            if block.get('total') is not None:
+                 fname = f"{base_fname}-Part{block['index']}-{block['total']}.xml"
+            else:
+                 # Standard naming without parts
+                 fname = f"{base_fname}.xml"
             
             created_files.append({
                 'name': fname, 
