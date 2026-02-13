@@ -1,0 +1,89 @@
+# Configuration for EUDAMED XML Generation - Product Group: Lens
+# 
+# visible_fields: List of XSD paths that should be displayed to the user.
+# defaults: Key-value pairs of XSD paths and their default values.
+
+visible_fields:
+  - MDRDevice/MDRBasicUDI/type
+  - MDRDevice/MDRBasicUDI/riskClass
+  - MDRDevice/MDRBasicUDI/model
+  - MDRDevice/MDRBasicUDI/identifier/DICode
+  - MDRDevice/MDRBasicUDI/identifier/issuingEntityCode
+  - MDRDevice/MDRBasicUDI/humanTissuesCells
+  - MDRDevice/MDRBasicUDI/animalTissuesCells
+  - MDRDevice/MDRBasicUDI/humanProductCheck
+  - MDRDevice/MDRBasicUDI/IIb_implantable_exceptions
+  - MDRDevice/MDRBasicUDI/medicinalProductCheck
+  - MDRDevice/MDRBasicUDI/active
+  - MDRDevice/MDRBasicUDI/administeringMedicine
+  - MDRDevice/MDRBasicUDI/implantable
+  - MDRDevice/MDRBasicUDI/measuringFunction
+  - MDRDevice/MDRBasicUDI/reusable
+  - MDRDevice/MDRBasicUDI/MFActorCode
+  - MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink/NBActorCode
+  - MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink/certificateType
+  - MDRDevice/MDRUDIDIData/identifier/DICode
+  - MDRDevice/MDRUDIDIData/identifier/issuingEntityCode
+  - MDRDevice/MDRUDIDIData/tradeNames
+  - MDRDevice/MDRUDIDIData/productionIdentifier
+  - MDRDevice/MDRUDIDIData/baseQuantity
+  - MDRDevice/MDRUDIDIData/website
+  - MDRDevice/MDRUDIDIData/storageHandlingConditions
+  - MDRDevice/MDRUDIDIData/storageHandlingConditions/condition
+  - MDRDevice/MDRUDIDIData/storageHandlingConditions/condition/storageHandlingConditionValue
+  - MDRDevice/MDRUDIDIData/storageHandlingConditions/condition/comments
+  - MDRDevice/MDRUDIDIData/storageHandlingConditions/condition/comments/name
+  - MDRDevice/MDRUDIDIData/storageHandlingConditions/condition/comments/name/language
+  - MDRDevice/MDRUDIDIData/criticalWarnings
+  - MDRDevice/MDRUDIDIData/criticalWarnings/warning
+  - MDRDevice/MDRUDIDIData/criticalWarnings/warning/warningValue
+  - MDRDevice/MDRUDIDIData/criticalWarnings/warning/comments
+  - MDRDevice/MDRUDIDIData/criticalWarnings/warning/comments/name
+  - MDRDevice/MDRUDIDIData/criticalWarnings/warning/comments/name/language
+  - MDRDevice/MDRUDIDIData/criticalWarnings/warning/comments/name/textValue
+  - MDRDevice/MDRUDIDIData/basicUDIIdentifier/DICode
+  - MDRDevice/MDRUDIDIData/basicUDIIdentifier/issuingEntityCode
+
+defaults:
+  MDRDevice/MDRBasicUDI/type: DEVICE
+  MDRDevice/MDRBasicUDI/riskClass: CLASS_IIB
+  MDRDevice/MDRBasicUDI/identifier/DICode: 599302877PAYU9
+  MDRDevice/MDRBasicUDI/modelName/model: 877PAY
+  MDRDevice/MDRBasicUDI/modelName/name: POSTERIOR CHAMBER INTRAOCULAR LENSES, PSEUDOPHAKIC, HYDROPHOBIC, PRELOADED IN A SINGLE USE INJECTOR
+  MDRDevice/MDRBasicUDI/humanTissuesCells: false
+  MDRDevice/MDRBasicUDI/animalTissuesCells: false
+  MDRDevice/MDRBasicUDI/active: true
+  MDRDevice/MDRBasicUDI/implantable: true
+  MDRDevice/MDRBasicUDI/MFActorCode: HU-MF-000026801
+  MDRDevice/MDRUDIDIData/identifier/DICode: "05993022103710"
+  MDRDevice/MDRUDIDIData/MDNCodes: P030102090201
+  MDRDevice/MDRUDIDIData/basicUDIIdentifier/DICode: 599302877PAYU9
+  MDRDevice/MDRUDIDIData/tradeNames/name/language: ANY
+  MDRDevice/MDRUDIDIData/tradeNames/name[0]/textValue: Bi-Flex POBMA
+  MDRDevice/MDRUDIDIData/referenceNumber: "05993022103710"
+  MDRDevice/MDRUDIDIData/productionIdentifier: BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE
+  MDRDevice/MDRUDIDIData/baseQuantity: 1
+  MDRDevice/MDRUDIDIData/website: https://medicontur.com/professionals/documents/eifus
+  MDRDevice/MDRUDIDIData/storageHandlingConditions/condition[0]/storageHandlingConditionValue: SHC006
+  MDRDevice/MDRUDIDIData/storageHandlingConditions/condition[0]/comments/name[0]/textValue: 10
+  MDRDevice/MDRUDIDIData/storageHandlingConditions/condition[1]/storageHandlingConditionValue: SHC007
+  MDRDevice/MDRUDIDIData/storageHandlingConditions/condition[1]/comments/name[0]/textValue: 25
+  MDRDevice/MDRUDIDIData/criticalWarnings/warning[0]/warningValue: CW010
+  MDRDevice/MDRUDIDIData/criticalWarnings/warning[0]/comments/name[0]/language: ANY
+  MDRDevice/MDRUDIDIData/criticalWarnings/warning[0]/comments/name[0]/textValue: "Consult instructions for use"
+  MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/warningValue: CW999
+  MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/comments/name[0]/language: EN
+  MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/comments/name[0]/textValue: "The IOL should not be used in: Zonular damage larger than 4 clock hours; Children under the age of one year; Chronic uveitis; Progressive eye disease (e.g. diabetic retinopathy, uncontrolled glaucoma); In case of preoperative complications prior to cataract surgery (e.g. vitrous body prolapse, haemorrhage); Patients with perforated or damaged capsules"
+  MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/comments/name[1]/language: HU
+  MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/comments/name[1]/textValue: "Az IOL nem alkalmazható az alábbi esetekben: 4 óránál kiterjedtebb zonuláris sérülés; Egy év alatti gyermekek; Krónikus uveitisz; Progresszív szembetegség (pl. diabéteszes retinopátia, nem kontrollált glaukóma); Szürkehályog-műtétet megelőző komplikációk esetén (pl. üvegtest-előesés, vérzés); Perforált vagy sérült kapszulával rendelkező betegek"
+  MDRDevice/MDRUDIDIData/identifier/issuingEntityCode: GS1
+  MDRDevice/MDRUDIDIData/basicUDIIdentifier/issuingEntityCode: GS1
+  MDRDevice/MDRBasicUDI/identifier/issuingEntityCode: GS1
+  MDRDevice/MDRUDIDIData/status/code: ON_THE_MARKET
+  MDRDevice/MDRUDIDIData/sterile: true
+  MDRDevice/MDRUDIDIData/numberOfReuses: 0
+
+envelope_settings:
+  security_token: "YOUR_SECURITY_TOKEN"
+  actor_code: "HU-MF-000026801"
+  party_id: "YOUR_PARTY_ID"
