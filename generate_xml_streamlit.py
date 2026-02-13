@@ -45,23 +45,23 @@ st.markdown("""
 def load_config(product_group):
     """Load YAML configuration for the selected product group."""
     if not product_group:
-        return {}, {}
+        return {}
         
     filename = f"EUDAMED_data_{product_group}.yaml"
     base_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(base_dir, filename)
     
     if not os.path.exists(file_path):
-        return None, None # Signal missing file
+        return None # Signal missing file
         
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = yaml.safe_load(f) or {}
-            # 'defaults' now handles both visibility (presence of key) and value (value of key)
-            return data.get('defaults', {}), data.get('envelope_settings', {})
+            # Return only 'defaults'.
+            return data.get('defaults', {})
     except Exception as e:
         st.error(f"Error loading config {filename}: {e}")
-        return {}, {}
+        return {}
 
 @st.cache_resource
 def load_eudamed_metadata():
@@ -831,10 +831,9 @@ if default_target in product_groups:
 selected_group = st.sidebar.selectbox("Select Product Group", ["None"] + product_groups, index=default_ix)
 
 config_defaults = None
-config_envelope = None
 
 if selected_group != "None":
-    config_defaults, config_envelope = load_config(selected_group)
+    config_defaults = load_config(selected_group)
     if config_defaults:
         st.sidebar.success(f"Loaded configuration for {selected_group}")
         
@@ -980,7 +979,7 @@ st.markdown("---")
 data_collection_container = {'csv_entries': []}
 
 # We use a distinct key prefix
-basic_udi_path = f"{mdr_device_element.local_name}"
+basic_udi_path = f"Push/payload/{mdr_device_element.local_name}"
 # Add selected_group to key prefix to ensure widgets refresh when configuration changes
 basic_udi_key_prefix = f"root_{selected_group}_{selected_root_element_name}"
 
@@ -1017,7 +1016,7 @@ if 'UDIDI' in target_scope:
             num_udis = st.number_input("Number of UDI-DI entries", min_value=1, max_value=max_udis, value=1, help=help_msg)
 
         udidi_data_list = []
-        udidi_base_path = f"{mdr_device_element.local_name}"
+        udidi_base_path = f"Push/payload/{mdr_device_element.local_name}"
         for i in range(num_udis):
             with st.expander(f"UDI-DI Entry #{i+1}", expanded=False):
                 # Pass unique parent key with group prefix
@@ -1470,10 +1469,10 @@ if submitted:
             sec_token = ""
             actor_code = ""
             party_id = ""
-            if config_envelope:
-                sec_token = config_envelope.get('security_token', '')
-                actor_code = config_envelope.get('actor_code', '')
-                party_id = config_envelope.get('party_id', '')
+            if config_defaults:
+                actor_code = config_defaults.get('Push/sender/node/nodeActorCode', '')
+                sec_token = config_defaults.get('Push/header/security_token', '')
+                party_id = config_defaults.get('Push/header/party_id', '')
 
             m_ns = f"{{{namespaces['m']}}}"
             ns2_ns = f"{{{namespaces['s']}}}"

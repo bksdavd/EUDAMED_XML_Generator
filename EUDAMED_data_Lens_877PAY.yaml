@@ -2,41 +2,43 @@
 # 'defaults' section defines both visibility (presence of key) and default values.
 
 defaults:
-  MDRDevice/MDRBasicUDI/type: DEVICE
-  MDRDevice/MDRBasicUDI/riskClass: CLASS_IIB
-  MDRDevice/MDRBasicUDI/model: 877PAY
-  MDRDevice/MDRBasicUDI/identifier/DICode: 599302877PAYU9
-  MDRDevice/MDRBasicUDI/identifier/issuingEntityCode: GS1
-  MDRDevice/MDRBasicUDI/humanTissuesCells: false
-  MDRDevice/MDRBasicUDI/animalTissuesCells: false
-  MDRDevice/MDRBasicUDI/humanProductCheck: false
-  MDRDevice/MDRBasicUDI/IIb_implantable_exceptions: false
-  MDRDevice/MDRBasicUDI/medicinalProductCheck: false
-  MDRDevice/MDRBasicUDI/active: false
-  MDRDevice/MDRBasicUDI/administeringMedicine: false
-  MDRDevice/MDRBasicUDI/implantable: true
-  MDRDevice/MDRBasicUDI/measuringFunction: false
-  MDRDevice/MDRBasicUDI/reusable: false
-  MDRDevice/MDRBasicUDI/MFActorCode: HU-MF-000026801
-  MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink[0]/NBActorCode: 0483
-  MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink[0]/certificateType: MDR_TYPE_EXAMINATION
-  MDRDevice/MDRUDIDIData/identifier/DICode: 05993029999996
-  MDRDevice/MDRUDIDIData/identifier/issuingEntityCode: GS1
-  MDRDevice/MDRUDIDIData/status/code: ON_THE_MARKET
-  MDRDevice/MDRUDIDIData/basicUDIIdentifier/DICode: 599302877PAYU9
-  MDRDevice/MDRUDIDIData/basicUDIIdentifier/issuingEntityCode: GS1
-  MDRDevice/MDRUDIDIData/MDNCodes: P030102090201
-  MDRDevice/MDRUDIDIData/productionIdentifier: BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE
-  MDRDevice/MDRUDIDIData/referenceNumber: 05993029999996
-  MDRDevice/MDRUDIDIData/sterile: true
-  MDRDevice/MDRUDIDIData/sterilization: false
-  MDRDevice/MDRUDIDIData/numberOfReuses: 0
-  MDRDevice/MDRUDIDIData/marketInfos/marketInfo[0]/country: HU
-  MDRDevice/MDRUDIDIData/marketInfos/marketInfo[0]/originalPlacedOnTheMarket: true
-  MDRDevice/MDRUDIDIData/baseQuantity: 1
-  MDRDevice/MDRUDIDIData/latex: false
-  MDRDevice/MDRUDIDIData/reprocessed: false
-envelope_settings:
-  security_token: YOUR_SECURITY_TOKEN
-  actor_code: HU-MF-000026801
-  party_id: YOUR_PARTY_ID
+  # Envelope / Header Settings
+  Push/sender/node/nodeActorCode: HU-MF-000026801
+  Push/header/security_token: YOUR_SECURITY_TOKEN
+  Push/header/party_id: YOUR_PARTY_ID
+
+  # Payload Settings
+  Push/payload/MDRDevice/MDRBasicUDI/type: DEVICE
+  Push/payload/MDRDevice/MDRBasicUDI/riskClass: CLASS_IIB
+  Push/payload/MDRDevice/MDRBasicUDI/model: 877PAY
+  Push/payload/MDRDevice/MDRBasicUDI/identifier/DICode: 599302877PAYU9
+  Push/payload/MDRDevice/MDRBasicUDI/identifier/issuingEntityCode: GS1
+  Push/payload/MDRDevice/MDRBasicUDI/humanTissuesCells: false
+  Push/payload/MDRDevice/MDRBasicUDI/animalTissuesCells: false
+  Push/payload/MDRDevice/MDRBasicUDI/humanProductCheck: false
+  Push/payload/MDRDevice/MDRBasicUDI/IIb_implantable_exceptions: false
+  Push/payload/MDRDevice/MDRBasicUDI/medicinalProductCheck: false
+  Push/payload/MDRDevice/MDRBasicUDI/active: false
+  Push/payload/MDRDevice/MDRBasicUDI/administeringMedicine: false
+  Push/payload/MDRDevice/MDRBasicUDI/implantable: true
+  Push/payload/MDRDevice/MDRBasicUDI/measuringFunction: false
+  Push/payload/MDRDevice/MDRBasicUDI/reusable: false
+  Push/payload/MDRDevice/MDRBasicUDI/MFActorCode: HU-MF-000026801
+  Push/payload/MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink[0]/NBActorCode: 0483
+  Push/payload/MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink[0]/certificateType: MDR_TYPE_EXAMINATION
+  Push/payload/MDRDevice/MDRUDIDIData/identifier/DICode: 05993029999996
+  Push/payload/MDRDevice/MDRUDIDIData/identifier/issuingEntityCode: GS1
+  Push/payload/MDRDevice/MDRUDIDIData/status/code: ON_THE_MARKET
+  Push/payload/MDRDevice/MDRUDIDIData/basicUDIIdentifier/DICode: 599302877PAYU9
+  Push/payload/MDRDevice/MDRUDIDIData/basicUDIIdentifier/issuingEntityCode: GS1
+  Push/payload/MDRDevice/MDRUDIDIData/MDNCodes: P030102090201
+  Push/payload/MDRDevice/MDRUDIDIData/productionIdentifier: BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE
+  Push/payload/MDRDevice/MDRUDIDIData/referenceNumber: 05993029999996
+  Push/payload/MDRDevice/MDRUDIDIData/sterile: true
+  Push/payload/MDRDevice/MDRUDIDIData/sterilization: false
+  Push/payload/MDRDevice/MDRUDIDIData/numberOfReuses: 0
+  Push/payload/MDRDevice/MDRUDIDIData/marketInfos/marketInfo[0]/country: HU
+  Push/payload/MDRDevice/MDRUDIDIData/marketInfos/marketInfo[0]/originalPlacedOnTheMarket: true
+  Push/payload/MDRDevice/MDRUDIDIData/baseQuantity: 1
+  Push/payload/MDRDevice/MDRUDIDIData/latex: false
+  Push/payload/MDRDevice/MDRUDIDIData/reprocessed: false
