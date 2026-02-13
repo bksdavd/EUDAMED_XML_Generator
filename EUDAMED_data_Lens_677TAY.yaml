@@ -34,6 +34,7 @@ visible_fields:
   - MDRDevice/MDRUDIDIData/sterile
   - MDRDevice/MDRUDIDIData/sterilization
   - MDRDevice/MDRUDIDIData/numberOfReuses
+  - MDRDevice/MDRUDIDIData/marketInfos
   - MDRDevice/MDRUDIDIData/marketInfos/marketInfo/country
   - MDRDevice/MDRUDIDIData/marketInfos/marketInfo/originalPlacedOnTheMarket
   - MDRDevice/MDRUDIDIData/baseQuantity
