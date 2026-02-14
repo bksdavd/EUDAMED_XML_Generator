@@ -233,15 +233,30 @@ async function main() {
                     
                     // Fix 2: Sender Service
                     if (key.endsWith('sender')) {
+                        console.log('DEBUG: Found sender key:', key);
                         const sender = obj[key];
-                        const hasService = Object.keys(sender).some(k => k.endsWith('service'));
+                        // Ensure sender has service block using 'm:service' not 's:service' (element mismatch fix)
+                        const hasService = Object.keys(sender).some(k => k.endsWith('service') && !k.endsWith('erviceOperation') && !k.endsWith('erviceID'));
+                        
+                        console.log('DEBUG: sender keys:', Object.keys(sender));
+
                         if (!hasService && typeof sender === 'object') {
-                            // Inject default service block
-                            sender['s:service'] = {
-                                's:serviceID': 'BasicUDI', 
-                                's:serviceOperation': options.mode,
-                                '@_xmlns:s': 'https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Service/v1'
+                             sender['m:service'] = {
+                                's:serviceID': target === 'BasicUDI' ? 'BasicUDI' : 'DEVICE', // Use correct service ID
+                                's:serviceOperation': options.mode
+                                // Namespace s is usually at root, but can be here if needed
                             };
+                            // If we generated 's:service' before, remove it if it exists and is wrong
+                            if (sender['s:service']) delete sender['s:service'];
+                        } else if (sender['s:service']) {
+                             console.log('DEBUG: Renaming s:service to m:service');
+                             // Correct existing bad key s:service -> m:service
+                             sender['m:service'] = sender['s:service'];
+                             delete sender['s:service'];
+                        } else if (sender['service']) {
+                            // If it exists as 'service', rename to 'm:service'
+                            sender['m:service'] = sender['service'];
+                            delete sender['service'];
                         }
                     }
 
@@ -253,6 +268,9 @@ async function main() {
                             // 1. BasicUDIType (Base)
                             // 2. DeviceBasicUDIType (Extension)
                             // 3. MDRBasicUDIType (Extension)
+                            
+                            const newUdi = {}; // Initialize new object for reordering
+
                             const correctOrder = [
                                 // BasicUDIType
                                 'riskClass', 'model', 'modelName', 'identifier', 'certificateLinks',
@@ -261,12 +279,10 @@ async function main() {
                                 'clinicalInvestigationLinks', 'deviceCertificateLinks',
                                 // MDRBasicUDIType
                                 'humanProductCheck', 'IIb_implantable_exceptions', 'medicinalProductCheck', 'specialDevice', 'type',
-                                // MDApplicablePropertiesGroup (flattened or group ref?) - usually appear as elements
-                                'activeDevice', 'administeringMedicine', 'containsLatex', 'containsNanomaterial', 'measuringFunction', 'reprocessedSingleUse', 'sterile'
+                                // MDApplicablePropertiesGroup
+                                'active', 'administeringMedicine', 'implantable', 'measuringFunction', 'reusable'
                             ];
 
-                            const newUdi = {};
-                            
                             correctOrder.forEach(prop => {
                                 // Match property ending with name
                                 const propKey = Object.keys(udi).find(k => k.endsWith(`:${prop}`) || k === prop);
