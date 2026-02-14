@@ -1,7 +1,7 @@
 <m:Push version="3.0.25">
-  <m:correlationID>e210264c-c8b8-406d-8c5a-59671f07af3a</m:correlationID>
-  <m:creationDateTime>2026-02-14T08:59:23.021Z</m:creationDateTime>
-  <m:messageID>515d4736-fbe9-4e3a-abfc-2477659d605c</m:messageID>
+  <m:correlationID>8cd93158-51eb-4a67-9c38-9bc81670de6f</m:correlationID>
+  <m:creationDateTime>2026-02-14T09:12:46.416Z</m:creationDateTime>
+  <m:messageID>4089999a-e744-465a-9a52-4e1a634f26a1</m:messageID>
   <m:recipient>
     <m:node>
       <s:nodeActorCode>EUDAMED</s:nodeActorCode>
@@ -25,7 +25,7 @@
         <basicudi:MFActorCode>HU-MF-000026801</basicudi:MFActorCode>
         <basicudi:deviceCertificateLinks>
           <links:deviceCertificateLink>
-            <links:NBActorCode>483</links:NBActorCode>
+            <links:NBActorCode>0483</links:NBActorCode>
             <links:certificateType>MDR_TYPE_EXAMINATION</links:certificateType>
           </links:deviceCertificateLink>
         </basicudi:deviceCertificateLinks>
@@ -41,7 +41,7 @@
       </device:MDRBasicUDI>
       <device:MDRUDIDIData>
         <udidi:identifier>
-          <commondi:DICode>5993029999996</commondi:DICode>
+          <commondi:DICode>05993029999996</commondi:DICode>
           <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
         </udidi:identifier>
         <udidi:status>
@@ -53,7 +53,7 @@
         </udidi:basicUDIIdentifier>
         <udidi:MDNCodes>P030102090201</udidi:MDNCodes>
         <udidi:productionIdentifier>BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE</udidi:productionIdentifier>
-        <udidi:referenceNumber>5993029999996</udidi:referenceNumber>
+        <udidi:referenceNumber>05993029999996</udidi:referenceNumber>
         <udidi:sterile>true</udidi:sterile>
         <udidi:sterilization>false</udidi:sterilization>
         <udidi:numberOfReuses>0</udidi:numberOfReuses>
