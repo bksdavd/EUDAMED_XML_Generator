@@ -49,7 +49,15 @@ async function main() {
     
     // Recipient Hardcoding if missing (Common pattern)
     if (!config['Push/recipient/node/nodeActorCode']) config['Push/recipient/node/nodeActorCode'] = 'EUDAMED';
-    if (!config['Push/recipient/service/serviceID']) config['Push/recipient/service/serviceID'] = 'DEVICE';
+    
+    // Dynamic Service ID default based on input type if provided before falling back to DEVICE
+    let defaultServiceID = 'DEVICE';
+    if (options.type) {
+        defaultServiceID = options.type; // Use the raw input type (e.g. BASIC_UDI)
+        if (defaultServiceID === 'UDIDI') defaultServiceID = 'UDI-DI';
+    }
+
+    if (!config['Push/recipient/service/serviceID']) config['Push/recipient/service/serviceID'] = defaultServiceID;
     if (!config['Push/recipient/service/serviceOperation']) config['Push/recipient/service/serviceOperation'] = options.mode; // POST/PATCH
     
     console.log(`Loaded configuration from ${options.config}`);
@@ -77,9 +85,21 @@ async function main() {
 
     const generator = new XMLGenerator(schemaLoader, config, nsMap);
     
-    const targets = [];
-    if (options.type === 'All' || options.type === 'BasicUDI') targets.push('BasicUDI');
-    if (options.type === 'All' || options.type === 'UDIDI') targets.push('UDIDI');
+    // Direct mapping: The user provides the TYPE (Service ID) directly.
+    // e.g., 'DEVICE' (for BasicUDI POST), 'UDI-DI' (for UDI POST), 'BASIC_UDI' (for BasicUDI PATCH)
+    // We map this to our internal generation targets.
+    
+    let internalTarget = 'BasicUDI'; // Default fallback
+    if (options.type === 'UDI-DI' || options.type === 'UDI_DI') {
+        internalTarget = 'UDIDI';
+    } else if (options.type === 'DEVICE' || options.type === 'BASIC_UDI') {
+        internalTarget = 'BasicUDI'; // DEVICE usually implies BasicUDI context in simple mode
+    } else {
+        // Fallback for direct internal names if used
+        internalTarget = options.type;
+    }
+
+    const targets = [internalTarget];
     
     if (!fs.existsSync(options.out)) {
         fs.mkdirSync(options.out, { recursive: true });
@@ -87,11 +107,10 @@ async function main() {
 
     // Define substitutions (Device abstract element -> MDRDevice concrete element)
     // We assume MDRDevice is available in the schema context (loaded via imports)
-    const substitutions = {};
 
     // 4. Generate
     for (const target of targets) {
-        console.log(`Generating ${target} (${options.mode})...`);
+        console.log(`Generating ${target} from input type '${options.type}' (${options.mode})...`);
         
         // Use substitutions to force generation of concrete MDRDevice content
         // Then post-processing will rename it back to Device with xsi:type
@@ -242,7 +261,7 @@ async function main() {
 
                         if (!hasService && typeof sender === 'object') {
                              sender['m:service'] = {
-                                's:serviceID': target === 'BasicUDI' ? 'BasicUDI' : 'DEVICE', // Use correct service ID
+                                's:serviceID': options.type, // Map input type directly to Service ID
                                 's:serviceOperation': options.mode
                                 // Namespace s is usually at root, but can be here if needed
                             };
@@ -252,10 +271,18 @@ async function main() {
                              console.log('DEBUG: Renaming s:service to m:service');
                              // Correct existing bad key s:service -> m:service
                              sender['m:service'] = sender['s:service'];
+                             
+                             // Overwrite service ID with input type
+                             sender['m:service']['s:serviceID'] = options.type;
+
                              delete sender['s:service'];
                         } else if (sender['service']) {
                             // If it exists as 'service', rename to 'm:service'
                             sender['m:service'] = sender['service'];
+                            
+                             // Overwrite service ID with input type
+                             sender['m:service']['s:serviceID'] = options.type;
+
                             delete sender['service'];
                         }
                     }
