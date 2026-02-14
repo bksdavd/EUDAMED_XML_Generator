@@ -115,16 +115,20 @@ class XMLGenerator {
             if (extensionKey) {
                 const extension = typeDef[contentKey][extensionKey];
                 
-                this.processAttributes(extension, currentPath, result);
-
+                // Determine base content first to maintain XSD sequence order
                 const baseType = extension['@_base'];
                 if (baseType) {
                     const baseDef = this.ctx.findType(baseType, typeDef._schema);
                     if (baseDef) {
                         const baseContent = this.processComplexType(baseDef, currentPath, filterPath);
-                        Object.assign(result, baseContent);
+                        if (baseContent) {
+                            Object.assign(result, baseContent);
+                        }
                     }
                 }
+
+                this.processAttributes(extension, currentPath, result);
+
                 // Process extension content (sequence/choice)
                 // Pass schema context to extension group
                 const extensionWithSchema = { ...extension, _schema: typeDef._schema };

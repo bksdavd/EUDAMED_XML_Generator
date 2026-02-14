@@ -53,8 +53,7 @@ async function main() {
     // Dynamic Service ID default based on input type if provided before falling back to DEVICE
     let defaultServiceID = 'DEVICE';
     if (options.type) {
-        defaultServiceID = options.type; // Use the raw input type (e.g. BASIC_UDI)
-        if (defaultServiceID === 'UDIDI') defaultServiceID = 'UDI-DI';
+        defaultServiceID = options.type; // Use the raw input type (e.g. BASIC_UDI or UDI_DI)
     }
 
     if (!config['Push/recipient/service/serviceID']) config['Push/recipient/service/serviceID'] = defaultServiceID;
@@ -159,19 +158,19 @@ async function main() {
             // Logic derived from user requests:
             // DEVICE/POST -> Device
             // BASIC_UDI/PATCH -> BasicUDI
-            // UDI-DI/POST -> UDIDIData (User says only UDI_DI block needed)
-            // UDI-DI/PATCH -> UDIDIData
+            // UDI_DI/POST -> UDIDIData (User says only UDI_DI block needed)
+            // UDI_DI/PATCH -> UDIDIData
             
-            const serviceID = options.type === 'UDIDI' ? 'UDI-DI' : options.type;
+            let serviceID = options.type.toUpperCase();
+            if (serviceID === 'BASICUDI' || serviceID === 'BASIC-UDI') serviceID = 'BASIC_UDI';
+            if (serviceID === 'UDIDI' || serviceID === 'UDI-DI') serviceID = 'UDI_DI';
 
             if (serviceID === 'BASIC_UDI' || (options.mode === 'PATCH' && target === 'BasicUDI')) {
-                 // BasicUDI is the payload
-                 // Config path: Push/payload/MDRDevice/MDRBasicUDI
-                 xmlObj = currentGenerator.generate('BasicUDI', 'Push/payload/MDRDevice/MDRBasicUDI', null, 'basicudi:MDRBasicUDIType');
-            } else if (serviceID === 'UDI-DI' || serviceID === 'UDI_DI' || (options.mode === 'PATCH' && target === 'UDIDI')) {
-                 // UDIDIData is the payload
-                 // Config path: Push/payload/MDRDevice/MDRUDIDIData
-                 xmlObj = currentGenerator.generate('UDIDIData', 'Push/payload/MDRDevice/MDRUDIDIData', null, 'udidi:MDRUDIDIDataType');
+                 // Use exact element name from MDRDevice sequence
+                 xmlObj = currentGenerator.generate('MDRBasicUDI', 'Push/payload/MDRDevice/MDRBasicUDI', null, 'basicudi:MDRBasicUDIType');
+            } else if (serviceID === 'UDI_DI' || (options.mode === 'PATCH' && target === 'UDIDI')) {
+                 // Use exact element name from MDRDevice sequence
+                 xmlObj = currentGenerator.generate('MDRUDIDIData', 'Push/payload/MDRDevice/MDRUDIDIData', null, 'udidi:MDRUDIDIDataType');
             } else if (serviceID === 'DEVICE') {
                  // Full Device is the payload
                  xmlObj = currentGenerator.generate('Push', 'Push');
@@ -183,20 +182,56 @@ async function main() {
             // If we generated a fragmentary payload (not starting from Push), wrap it manually
             if (serviceID !== 'DEVICE') { // Assuming DEVICE uses standard Push gen
                 if (xmlObj) {
-                     // Need headers
+                     // Need headers - Order matters for XSD validation!
                      const pushContent = {
-                             '@_version': '3.0.25',
-                             'm:messageID': config['Push/messageID'],
-                             'm:correlationID': config['Push/correlationID'],
-                             'm:creationDateTime': config['Push/creationDateTime'],
-                             'm:recipient': {
-                                 'm:node': { 's:nodeActorCode': config['Push/recipient/node/nodeActorCode'] },
-                                 'm:service': { 
-                                     's:serviceID': serviceID,
-                                     's:serviceOperation': options.mode 
-                                 }
-                             },
-                             'm:payload': xmlObj
+                             '@_version': '3.0.25'
+                     };
+                     
+                     if (config['Push/conversationID']) pushContent['m:conversationID'] = config['Push/conversationID'];
+                     pushContent['m:correlationID'] = config['Push/correlationID'];
+                     pushContent['m:creationDateTime'] = config['Push/creationDateTime'];
+                     pushContent['m:messageID'] = config['Push/messageID'];
+                     
+                     const recipientNode = {
+                         's:nodeActorCode': config['Push/recipient/node/nodeActorCode'] || 'EUDAMED'
+                     };
+                     if (config['Push/recipient/node/nodeID']) {
+                         recipientNode['s:nodeID'] = config['Push/recipient/node/nodeID'];
+                     } else if (serviceID !== 'DEVICE') {
+                         // Keep the standard default for EUDAMED node if not DEVICE mode
+                         recipientNode['s:nodeID'] = 'eDelivery:EUDAMED';
+                     }
+
+                     const recipientService = {
+                         's:serviceID': serviceID,
+                         's:serviceOperation': options.mode 
+                     };
+                     if (config['Push/header/security_token']) {
+                         recipientService['s:serviceAccessToken'] = config['Push/header/security_token'];
+                     }
+
+                     pushContent['m:recipient'] = {
+                         'm:node': recipientNode,
+                         'm:service': recipientService
+                     };
+                     
+                     pushContent['m:payload'] = xmlObj;
+                     
+                     // Sender block
+                     const senderNode = {};
+                     if (config['Push/sender/node/nodeActorCode']) {
+                         senderNode['s:nodeActorCode'] = config['Push/sender/node/nodeActorCode'];
+                     }
+                     if (config['Push/header/party_id']) {
+                         senderNode['s:nodeID'] = config['Push/header/party_id'];
+                     }
+
+                     pushContent['m:sender'] = {
+                         'm:node': senderNode,
+                         'm:service': {
+                             's:serviceID': serviceID,
+                             's:serviceOperation': options.mode
+                         }
                      };
 
                      // Inject extracted namespaces dynamically

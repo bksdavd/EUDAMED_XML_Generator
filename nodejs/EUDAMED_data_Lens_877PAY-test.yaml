@@ -4,10 +4,9 @@
 defaults:
   # Envelope / Header Settings
   Push/sender/node/nodeActorCode: HU-MF-000026801
-  Push/header/security_token: YOUR_SECURITY_TOKEN
-  Push/header/party_id: YOUR_PARTY_ID
 
   # Payload Settings
+  Push/payload/MDRDevice/MDRBasicUDI/version: 2
   Push/payload/MDRDevice/MDRBasicUDI/type: DEVICE
   Push/payload/MDRDevice/MDRBasicUDI/riskClass: CLASS_IIB
   Push/payload/MDRDevice/MDRBasicUDI/model: 877PAY-Test
@@ -26,6 +25,7 @@ defaults:
   Push/payload/MDRDevice/MDRBasicUDI/MFActorCode: HU-MF-000026801
   Push/payload/MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink[0]/NBActorCode: "0483"
   Push/payload/MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink[0]/certificateType: MDR_TYPE_EXAMINATION
+  Push/payload/MDRDevice/MDRUDIDIData/version: 2
   Push/payload/MDRDevice/MDRUDIDIData/identifier/DICode: "05993029999903"
   Push/payload/MDRDevice/MDRUDIDIData/identifier/issuingEntityCode: GS1
   Push/payload/MDRDevice/MDRUDIDIData/status/code: ON_THE_MARKET
