@@ -90,14 +90,9 @@ async function main() {
     // Recipient Hardcoding if missing (Common pattern)
     if (!config['Push/recipient/node/nodeActorCode']) config['Push/recipient/node/nodeActorCode'] = 'EUDAMED';
     
-    // Dynamic Service ID default based on input type if provided before falling back to DEVICE
-    let defaultServiceID = 'DEVICE';
-    if (options.type) {
-        defaultServiceID = options.type; // Use the raw input type (e.g. BASIC_UDI or UDI_DI)
-    }
-
-    if (!config['Push/recipient/service/serviceID']) config['Push/recipient/service/serviceID'] = defaultServiceID;
-    if (!config['Push/recipient/service/serviceOperation']) config['Push/recipient/service/serviceOperation'] = options.mode; // POST/PATCH
+    // Recipient service setup
+    if (!config['Push/recipient/service/serviceID']) config['Push/recipient/service/serviceID'] = options.type;
+    if (!config['Push/recipient/service/serviceOperation']) config['Push/recipient/service/serviceOperation'] = options.mode;
     
     console.log(`Loaded configuration from ${options.config}`);
 
