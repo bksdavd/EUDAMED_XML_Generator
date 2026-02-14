@@ -26,7 +26,7 @@ const BASE_NS_MAP = {
 
 // --- CLI CONFIGURATION ---
 program
-  .option('-c, --config <path>', 'Path to YAML configuration file', 'EUDAMED_data_Lens_877PAY.yaml')
+  .option('-c, --config <path>', 'Path to YAML configuration file', './EUDAMED_data_Lens_877PAY-test.yaml')
   .option('-s, --schema <path>', 'Path to XSD schema file', '../EUDAMED downloaded/XSD/service/Message.xsd')
   .option('-o, --out <dir>', 'Output directory', 'output')
   .option('--type <type>', 'Specific type to generate (DEVICE, UDI_DI, BASIC_UDI)')
