@@ -11,7 +11,7 @@ class XMLGenerator {
     }
 
     // Main entry point
-    generate(rootElementName, startPath = "Push", filterPath = null) {
+    generate(rootElementName, startPath = "Push", filterPath = null, typeOverride = null) {
         let rootEl = this.ctx.getElement(rootElementName);
         if (!rootEl) {
              // Try local name lookup if full name fails
@@ -27,7 +27,21 @@ class XMLGenerator {
         const rootKey = prefix ? `${prefix}:${rootElementName}` : rootElementName;
         
         // Root element always exists in output if called
-        const content = this.processElement(rootEl, startPath, filterPath);
+        let content = null;
+        if (typeOverride) {
+            const typeDef = this.ctx.findType(typeOverride, rootEl._schema);
+            if (typeDef) {
+                content = this.processComplexType(typeDef, startPath, filterPath);
+                if (content) {
+                    content['@_xsi:type'] = typeOverride;
+                }
+            } else {
+                 console.warn(`Type override not found: ${typeOverride}`);
+                 content = this.processElement(rootEl, startPath, filterPath);
+            }
+        } else {
+            content = this.processElement(rootEl, startPath, filterPath);
+        }
         
         if (content === null) return null;
 

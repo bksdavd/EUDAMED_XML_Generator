@@ -122,8 +122,44 @@ async function main() {
         const currentGenerator = new XMLGenerator(schemaLoader, targetConfig, NS_MAP, substitutions);
 
         try {
-            // Pass 'Push' as explicit startPath
-            const xmlObj = currentGenerator.generate('Push', 'Push');
+            let xmlObj = null;
+            
+            if (options.mode === 'PATCH') {
+                if (target === 'BasicUDI') {
+                     // PATCH BasicUDI -> Root BasicUDI using MDRBasicUDIType
+                     // Config path: Push/payload/MDRDevice/MDRBasicUDI
+                     xmlObj = currentGenerator.generate('BasicUDI', 'Push/payload/MDRDevice/MDRBasicUDI', null, 'basicudi:MDRBasicUDIType');
+                } else if (target === 'UDIDI') {
+                     // PATCH UDIDI -> Root UDIDIData using MDRUDIDIDataType
+                     // Config path: Push/payload/MDRDevice/MDRUDIDIData
+                     xmlObj = currentGenerator.generate('UDIDIData', 'Push/payload/MDRDevice/MDRUDIDIData', null, 'udidi:MDRUDIDIDataType');
+                }
+                
+                // Wrap in Push Envelope manually since we bypassed 'Push' generation
+                if (xmlObj) {
+                     // Need headers
+                     xmlObj = {
+                         'm:Push': {
+                             '@_version': '3.0.25',
+                             'm:messageID': config['Push/messageID'],
+                             'm:correlationID': config['Push/correlationID'],
+                             'm:creationDateTime': config['Push/creationDateTime'],
+                             'm:recipient': {
+                                 'm:node': { 's:nodeActorCode': config['Push/recipient/node/nodeActorCode'] },
+                                 'm:service': { 
+                                     's:serviceID': config['Push/recipient/service/serviceID'],
+                                     's:serviceOperation': options.mode 
+                                 }
+                             },
+                             'm:payload': xmlObj
+                         }
+                     };
+                }
+            } else {
+                // POST / Default
+                // Pass 'Push' as explicit startPath
+                xmlObj = currentGenerator.generate('Push', 'Push');
+            }
             
             if (!xmlObj) {
                 console.warn(`No content generated for ${target}. Check config and schema.`);
