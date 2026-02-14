@@ -19,11 +19,51 @@ program
   .option('-c, --config <path>', 'Path to YAML configuration file', 'EUDAMED_data_Lens_877PAY.yaml')
   .option('-s, --schema <path>', 'Path to XSD schema file', '../EUDAMED downloaded/XSD/service/Message.xsd')
   .option('-o, --out <dir>', 'Output directory', 'output')
-  .option('--type <type>', 'Specific type to generate (BasicUDI, UDIDI, All)', 'All')
-  .option('--mode <mode>', 'Operation mode (POST, PATCH)', 'POST');
+  .option('--type <type>', 'Specific type to generate (DEVICE, UDI_DI, BASIC_UDI)')
+  .option('--mode <mode>', 'Operation mode (POST, PATCH)');
 
+program.setOptionValueWithSource('mode', 'POST', 'default');
 program.parse(process.argv);
 const options = program.opts();
+
+// --- INPUT VALIDATION ---
+if (!options.type) {
+    console.error('Error: --type parameter is required (DEVICE, UDI_DI, or BASIC_UDI)');
+    process.exit(1);
+}
+
+const validTypes = ['DEVICE', 'UDI_DI', 'BASIC_UDI'];
+const normalizedType = options.type.toUpperCase().replace('-', '_');
+
+if (!validTypes.includes(normalizedType)) {
+    console.error(`Error: Invalid type '${options.type}'. Supported types: ${validTypes.join(', ')}`);
+    process.exit(1);
+}
+
+const validModes = ['POST', 'PATCH'];
+const mode = options.mode ? options.mode.toUpperCase() : 'POST';
+
+if (!validModes.includes(mode)) {
+    console.error(`Error: Invalid mode '${options.mode}'. Supported modes: ${validModes.join(', ')}`);
+    process.exit(1);
+}
+
+// Check valid combinations
+const validCombinations = {
+    'DEVICE': ['POST'],
+    'UDI_DI': ['POST', 'PATCH'],
+    'BASIC_UDI': ['PATCH']
+};
+
+if (!validCombinations[normalizedType].includes(mode)) {
+    console.error(`Error: Invalid combination. Type '${normalizedType}' does not support mode '${mode}'.`);
+    console.error(`Supported modes for ${normalizedType}: ${validCombinations[normalizedType].join(', ')}`);
+    process.exit(1);
+}
+
+// Update options with normalized values
+options.type = normalizedType;
+options.mode = mode;
 
 async function main() {
     console.log('--- EUDAMED XML Generator (Node.js) ---');
