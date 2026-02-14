@@ -7,18 +7,22 @@ class XMLGenerator {
         this.config = config;
         this.nsMap = nsMap;
         this.substitutions = substitutions;
-        this.debug = false;
+        this.debug = true;
     }
 
     // Main entry point
     generate(rootElementName, startPath = "Push", filterPath = null) {
-        const rootEl = this.ctx.getElement(rootElementName);
+        let rootEl = this.ctx.getElement(rootElementName);
+        if (!rootEl) {
+             // Try local name lookup if full name fails
+             rootEl = this.ctx.getElement(rootElementName.split(':')[1] || rootElementName);
+        }
         if (!rootEl) {
             throw new Error(`Root element not found: ${rootElementName}`);
         }
         
         // Determine root key with namespace
-        const ns = rootEl['@_targetNamespace'] || rootEl._schema['@_targetNamespace'];
+        const ns = rootEl['@_targetNamespace'] || (rootEl._schema ? rootEl._schema['@_targetNamespace'] : null);
         const prefix = this.getPrefix(ns);
         const rootKey = prefix ? `${prefix}:${rootElementName}` : rootElementName;
         
@@ -28,6 +32,8 @@ class XMLGenerator {
         if (content === null) return null;
 
         const result = {};
+        // If the processed element content is an object and contains attributes (starting with @_),
+        // we might want to ensure the root key handles them correctly but logic handles deeply.
         result[rootKey] = content;
         return result;
     }
@@ -134,10 +140,11 @@ class XMLGenerator {
             }
 
             // Check config for attribute value
+            // Prefer attribute specific key (@name)
             let val = this.getValueFromConfig(`${currentPath}/@${name}`);
-            if (val === undefined) {
-                 val = this.getValueFromConfig(`${currentPath}/${name}`);
-            }
+            
+            // If not found, try simple key (name) but this is risky for attributes that share name with elements
+            // Only do fallback if no element conflict... but we can't easily know here.
             
             if (val !== undefined) {
                 resultObj[`@_${name}`] = val;
@@ -261,6 +268,22 @@ class XMLGenerator {
         sequences.forEach(seq => {
             const subResult = this.processGroup({ 'sequence': seq, _schema: parentDef._schema }, currentPath, filterPath);
             Object.assign(result, subResult);
+        });
+
+        // 4. Process Nested Groups (xs:group ref="...")
+        const groups = this.ctx.ensureArray(container, 'group');
+        groups.forEach(g => {
+            const ref = g['@_ref'];
+            if (this.debug) console.log(`Processing Nested Group ref=${ref}`);
+            const groupDef = this.ctx.getGroup(ref);
+            if (groupDef) {
+                 // Determine sequence/choice/all inside the group definition
+                 // Ensure group def has schema context needed for namespace resolution? 
+                 // It relies on finding elements inside processGroup. 
+                 // Recursion handles it.
+                 const subResult = this.processGroup(groupDef, currentPath, filterPath);
+                 Object.assign(result, subResult);
+            }
         });
 
         return result;

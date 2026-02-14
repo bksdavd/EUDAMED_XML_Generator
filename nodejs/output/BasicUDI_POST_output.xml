@@ -1,4 +1,16 @@
 <m:Push version="3.0.25">
+  <m:correlationID>e210264c-c8b8-406d-8c5a-59671f07af3a</m:correlationID>
+  <m:creationDateTime>2026-02-14T08:59:23.021Z</m:creationDateTime>
+  <m:messageID>515d4736-fbe9-4e3a-abfc-2477659d605c</m:messageID>
+  <m:recipient>
+    <m:node>
+      <s:nodeActorCode>EUDAMED</s:nodeActorCode>
+    </m:node>
+    <m:service>
+      <s:serviceID>DEVICE</s:serviceID>
+      <s:serviceOperation>POST</s:serviceOperation>
+    </m:service>
+  </m:recipient>
   <m:payload>
     <device:MDRDevice>
       <device:MDRBasicUDI>
@@ -21,7 +33,40 @@
         <basicudi:IIb_implantable_exceptions>false</basicudi:IIb_implantable_exceptions>
         <basicudi:medicinalProductCheck>false</basicudi:medicinalProductCheck>
         <basicudi:type>DEVICE</basicudi:type>
+        <commondi:active>false</commondi:active>
+        <commondi:administeringMedicine>false</commondi:administeringMedicine>
+        <commondi:implantable>true</commondi:implantable>
+        <commondi:measuringFunction>false</commondi:measuringFunction>
+        <commondi:reusable>false</commondi:reusable>
       </device:MDRBasicUDI>
+      <device:MDRUDIDIData>
+        <udidi:identifier>
+          <commondi:DICode>5993029999996</commondi:DICode>
+          <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
+        </udidi:identifier>
+        <udidi:status>
+          <commondi:code>ON_THE_MARKET</commondi:code>
+        </udidi:status>
+        <udidi:basicUDIIdentifier>
+          <commondi:DICode>599302877PAYU9</commondi:DICode>
+          <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
+        </udidi:basicUDIIdentifier>
+        <udidi:MDNCodes>P030102090201</udidi:MDNCodes>
+        <udidi:productionIdentifier>BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE</udidi:productionIdentifier>
+        <udidi:referenceNumber>5993029999996</udidi:referenceNumber>
+        <udidi:sterile>true</udidi:sterile>
+        <udidi:sterilization>false</udidi:sterilization>
+        <udidi:numberOfReuses>0</udidi:numberOfReuses>
+        <udidi:marketInfos>
+          <marketinfo:marketInfo>
+            <marketinfo:country>HU</marketinfo:country>
+            <marketinfo:originalPlacedOnTheMarket>true</marketinfo:originalPlacedOnTheMarket>
+          </marketinfo:marketInfo>
+        </udidi:marketInfos>
+        <udidi:baseQuantity>1</udidi:baseQuantity>
+        <udidi:latex>false</udidi:latex>
+        <udidi:reprocessed>false</udidi:reprocessed>
+      </device:MDRUDIDIData>
     </device:MDRDevice>
   </m:payload>
   <m:sender>

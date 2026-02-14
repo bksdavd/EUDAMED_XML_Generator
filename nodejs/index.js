@@ -5,6 +5,7 @@ const yaml = require('js-yaml');
 const { XMLBuilder } = require('fast-xml-parser');
 const SchemaContext = require('./lib/schema');
 const XMLGenerator = require('./lib/generator');
+const crypto = require('crypto');
 
 const NS_MAP = {
     'https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/v1': 'device',
@@ -37,11 +38,28 @@ async function main() {
     
     // 1. Load Config
     if (!fs.existsSync(options.config)) {
-        console.error(`Config file not found: ${options.config}`);
-        process.exit(1);
+        // Try relative to previous cwd if fail
+         if (!fs.existsSync(path.resolve(__dirname, options.config))) {
+             console.error(`Config file not found: ${options.config}`);
+             process.exit(1);
+         } else {
+             options.config = path.resolve(__dirname, options.config);
+         }
     }
     const configRaw = yaml.load(fs.readFileSync(options.config, 'utf8'));
     const config = configRaw.defaults || {};
+    
+    // Header Auto-generation
+    // If config is missing these keys, generate random ones.
+    if (!config['Push/messageID']) config['Push/messageID'] = crypto.randomUUID();
+    if (!config['Push/correlationID']) config['Push/correlationID'] = crypto.randomUUID();
+    if (!config['Push/creationDateTime']) config['Push/creationDateTime'] = new Date().toISOString();
+    
+    // Recipient Hardcoding if missing (Common pattern)
+    if (!config['Push/recipient/node/nodeActorCode']) config['Push/recipient/node/nodeActorCode'] = 'EUDAMED';
+    if (!config['Push/recipient/service/serviceID']) config['Push/recipient/service/serviceID'] = 'DEVICE';
+    if (!config['Push/recipient/service/serviceOperation']) config['Push/recipient/service/serviceOperation'] = options.mode; // POST/PATCH
+    
     console.log(`Loaded configuration from ${options.config}`);
 
     // 2. Load Schema
@@ -74,17 +92,22 @@ async function main() {
         console.log(`Generating ${target} (${options.mode})...`);
         
         // Config filtering to isolate payloads
+        // optimization: For 'BasicUDI', we generally want MDRDevice which might include UDIDI data for a Full Device Post.
+        // We will only strictly filter if the user explicitly requested a split (not implemented here) or if we want to enforce separation.
+        // Given the user feedback, we'll allow UDIDI data in BasicUDI generation if present in config.
+        
         const targetConfig = { ...config };
         
-        if (target === 'BasicUDI') {
-            // Remove UDI-DI keys
-            Object.keys(targetConfig).forEach(k => {
-                if (k.includes('/MDRUDIDIData') || k.includes('/MDRUDIDIData/')) {
-                    delete targetConfig[k];
-                }
-            });
+        /* 
+           Disabled filtering to allow full Device payloads.
+           The generator will only generate what is in the config map.
+           If the user supplies config for UDIDI, it will appear in the output if the Schema allows it (MDRDevice allows both).
+        */
+        if (target === 'BasicUDI' && false) {
+             // ... kept for reference but disabled
         }
         
+        /*
         if (target === 'UDIDI') {
             // Remove BasicUDI keys
             Object.keys(targetConfig).forEach(k => {
@@ -93,6 +116,7 @@ async function main() {
                 }
             });
         }
+        */
         
         // Re-init generator with filtered config for this run
         const currentGenerator = new XMLGenerator(schemaLoader, targetConfig, NS_MAP, substitutions);

@@ -13,6 +13,7 @@ class SchemaContext {
         this.schemas = {}; // Map of targetNamespace -> Schema Object
         this.elements = {}; // Global element lookup
         this.types = {}; // Global type lookup
+        this.groups = {}; // Global group lookup
         this.processedFiles = new Set();
     }
 
@@ -93,6 +94,18 @@ class SchemaContext {
                 if (!this.types[name]) this.types[name] = this.types[key];
             }
         });
+
+        // Index Groups
+        const groups = this.ensureArray(schemaRoot, 'group');
+        groups.forEach(g => {
+            const name = g['@_name'];
+            if (name) {
+                const key = targetNamespace ? `{${targetNamespace}}${name}` : name;
+                this.groups[key] = { ...g, _schema: schemaRoot };
+                // Also index by local name (fallback)
+                if (!this.groups[name]) this.groups[name] = this.groups[key];
+            }
+        });
     }
 
     ensureArray(root, keySuffix) {
@@ -118,6 +131,16 @@ class SchemaContext {
         
         return key ? this.elements[key] : null;
     }
+
+    getGroup(name) {
+        if (!name) return null;
+        if (this.groups[name]) return this.groups[name];
+        
+        const localName = name.includes(':') ? name.split(':')[1] : name;
+        const key = Object.keys(this.groups).find(k => k.endsWith('}' + localName) || k === localName);
+        return key ? this.groups[key] : null;
+    }
+
 
     getType(name) {
         // Name might have prefix 'tns:Type'
