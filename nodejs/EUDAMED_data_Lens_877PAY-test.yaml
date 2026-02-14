@@ -25,34 +25,97 @@ defaults:
   Push/payload/MDRDevice/MDRBasicUDI/MFActorCode: HU-MF-000026801
   Push/payload/MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink[0]/NBActorCode: "0483"
   Push/payload/MDRDevice/MDRBasicUDI/deviceCertificateLinks/deviceCertificateLink[0]/certificateType: MDR_TYPE_EXAMINATION
-  Push/payload/MDRDevice/MDRUDIDIData/version: 2
-  Push/payload/MDRDevice/MDRUDIDIData/identifier/DICode: "05993029999903"
-  Push/payload/MDRDevice/MDRUDIDIData/identifier/issuingEntityCode: GS1
-  Push/payload/MDRDevice/MDRUDIDIData/status/code: ON_THE_MARKET
-  Push/payload/MDRDevice/MDRUDIDIData/basicUDIIdentifier/DICode: "599302877PAXU7"
-  Push/payload/MDRDevice/MDRUDIDIData/basicUDIIdentifier/issuingEntityCode: GS1
-  Push/payload/MDRDevice/MDRUDIDIData/MDNCodes: P030102090201
-  Push/payload/MDRDevice/MDRUDIDIData/productionIdentifier: BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE
-  Push/payload/MDRDevice/MDRUDIDIData/referenceNumber: "05993029999903"
-  Push/payload/MDRDevice/MDRUDIDIData/sterile: true
-  Push/payload/MDRDevice/MDRUDIDIData/sterilization: false
-  Push/payload/MDRDevice/MDRUDIDIData/numberOfReuses: 0
-  Push/payload/MDRDevice/MDRUDIDIData/marketInfos/marketInfo[0]/country: HU
-  Push/payload/MDRDevice/MDRUDIDIData/marketInfos/marketInfo[0]/originalPlacedOnTheMarket: true
-  Push/payload/MDRDevice/MDRUDIDIData/baseQuantity: 1
-  Push/payload/MDRDevice/MDRUDIDIData/latex: false
-  Push/payload/MDRDevice/MDRUDIDIData/reprocessed: false
-  Push/payload/MDRDevice/MDRUDIDIData/website: https://medicontur.com/professionals/documents/eifus
-  Push/payload/MDRDevice/MDRUDIDIData/storageHandlingConditions/condition[0]/storageHandlingConditionValue: SHC006
-  Push/payload/MDRDevice/MDRUDIDIData/storageHandlingConditions/condition[0]/comments/name[0]/textValue: 10
-  Push/payload/MDRDevice/MDRUDIDIData/storageHandlingConditions/condition[1]/storageHandlingConditionValue: SHC007
-  Push/payload/MDRDevice/MDRUDIDIData/storageHandlingConditions/condition[1]/comments/name[0]/textValue: 25
-  Push/payload/MDRDevice/MDRUDIDIData/criticalWarnings/warning[0]/warningValue: CW010
-  Push/payload/MDRDevice/MDRUDIDIData/criticalWarnings/warning[0]/comments/name[0]/language: ANY
-  Push/payload/MDRDevice/MDRUDIDIData/criticalWarnings/warning[0]/comments/name[0]/textValue: "Consult instructions for use"
-  Push/payload/MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/warningValue: CW999
-  Push/payload/MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/comments/name[0]/language: EN
-  Push/payload/MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/comments/name[0]/textValue: "The IOL should not be used in: Zonular damage larger than 4 clock hours; Children under the age of one year; Chronic uveitis; Progressive eye disease (e.g. diabetic retinopathy, uncontrolled glaucoma); In case of preoperative complications prior to cataract surgery (e.g. vitrous body prolapse, haemorrhage); Patients with perforated or damaged capsules"
-  Push/payload/MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/comments/name[1]/language: HU
-  Push/payload/MDRDevice/MDRUDIDIData/criticalWarnings/warning[1]/comments/name[1]/textValue: "Az IOL nem alkalmazható az alábbi esetekben: 4 óránál kiterjedtebb zonuláris sérülés; Egy év alatti gyermekek; Krónikus uveitisz; Progresszív szembetegség (pl. diabéteszes retinopátia, nem kontrollált glaukóma); Szürkehályog-műtétet megelőző komplikációk esetén (pl. üvegtest-előesés, vérzés); Perforált vagy sérült kapszulával rendelkező betegek"
+  Push/payload/MDRDevice/MDRUDIDIData[0]/version: 2
+  Push/payload/MDRDevice/MDRUDIDIData[0]/identifier/DICode: "05993029999903"
+  Push/payload/MDRDevice/MDRUDIDIData[0]/identifier/issuingEntityCode: GS1
+  Push/payload/MDRDevice/MDRUDIDIData[0]/status/code: ON_THE_MARKET
+  Push/payload/MDRDevice/MDRUDIDIData[0]/basicUDIIdentifier/DICode: "599302877PAXU7"
+  Push/payload/MDRDevice/MDRUDIDIData[0]/basicUDIIdentifier/issuingEntityCode: GS1
+  Push/payload/MDRDevice/MDRUDIDIData[0]/MDNCodes: P030102090201
+  Push/payload/MDRDevice/MDRUDIDIData[0]/productionIdentifier: BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE
+  Push/payload/MDRDevice/MDRUDIDIData[0]/referenceNumber: "05993029999903"
+  Push/payload/MDRDevice/MDRUDIDIData[0]/sterile: true
+  Push/payload/MDRDevice/MDRUDIDIData[0]/sterilization: false
+  Push/payload/MDRDevice/MDRUDIDIData[0]/numberOfReuses: 0
+  Push/payload/MDRDevice/MDRUDIDIData[0]/marketInfos/marketInfo[0]/country: HU
+  Push/payload/MDRDevice/MDRUDIDIData[0]/marketInfos/marketInfo[0]/originalPlacedOnTheMarket: true
+  Push/payload/MDRDevice/MDRUDIDIData[0]/baseQuantity: 1
+  Push/payload/MDRDevice/MDRUDIDIData[0]/latex: false
+  Push/payload/MDRDevice/MDRUDIDIData[0]/reprocessed: false
+  Push/payload/MDRDevice/MDRUDIDIData[0]/website: https://medicontur.com/professionals/documents/eifus
+  Push/payload/MDRDevice/MDRUDIDIData[0]/storageHandlingConditions/condition[0]/storageHandlingConditionValue: SHC006
+  Push/payload/MDRDevice/MDRUDIDIData[0]/storageHandlingConditions/condition[0]/comments/name[0]/textValue: 15
+  Push/payload/MDRDevice/MDRUDIDIData[0]/storageHandlingConditions/condition[1]/storageHandlingConditionValue: SHC007
+  Push/payload/MDRDevice/MDRUDIDIData[0]/storageHandlingConditions/condition[1]/comments/name[0]/textValue: 30
+  Push/payload/MDRDevice/MDRUDIDIData[0]/criticalWarnings/warning[0]/warningValue: CW010
+  Push/payload/MDRDevice/MDRUDIDIData[0]/criticalWarnings/warning[0]/comments/name[0]/language: ANY
+  Push/payload/MDRDevice/MDRUDIDIData[0]/criticalWarnings/warning[0]/comments/name[0]/textValue: "Consult instructions for use"
+  Push/payload/MDRDevice/MDRUDIDIData[0]/criticalWarnings/warning[1]/warningValue: CW010
+  Push/payload/MDRDevice/MDRUDIDIData[0]/criticalWarnings/warning[1]/comments/name[0]/language: EN
+  Push/payload/MDRDevice/MDRUDIDIData[0]/criticalWarnings/warning[1]/comments/name[0]/textValue: "The IOL should not be used in: Zonular damage larger than 4 clock hours; Children under the age of one year; Chronic uveitis; Progressive eye disease (e.g. diabetic retinopathy, uncontrolled glaucoma); In case of preoperative complications prior to cataract surgery (e.g. vitrous body prolapse, haemorrhage); Patients with perforated or damaged capsules"
+  Push/payload/MDRDevice/MDRUDIDIData[0]/criticalWarnings/warning[1]/comments/name[1]/language: HU
+  Push/payload/MDRDevice/MDRUDIDIData[0]/criticalWarnings/warning[1]/comments/name[1]/textValue: "Az IOL nem alkalmazható az alábbi esetekben: 4 óránál kiterjedtebb zonuláris sérülés; Egy év alatti gyermekek; Krónikus uveitisz; Progresszív szembetegség (pl. diabéteszes retinopátia, nem kontrollált glaukóma); Szürkehályog-műtétet megelőző komplikációk esetén (pl. üvegtest-előesés, vérzés); Perforált vagy sérült kapszulával rendelkező betegek"
+  
+  Push/payload/MDRDevice/MDRUDIDIData[1]/version: 2
+  Push/payload/MDRDevice/MDRUDIDIData[1]/identifier/DICode: "05993029999910"
+  Push/payload/MDRDevice/MDRUDIDIData[1]/identifier/issuingEntityCode: GS1
+  Push/payload/MDRDevice/MDRUDIDIData[1]/status/code: ON_THE_MARKET
+  Push/payload/MDRDevice/MDRUDIDIData[1]/basicUDIIdentifier/DICode: "599302877PAXU7"
+  Push/payload/MDRDevice/MDRUDIDIData[1]/basicUDIIdentifier/issuingEntityCode: GS1
+  Push/payload/MDRDevice/MDRUDIDIData[1]/MDNCodes: P030102090201
+  Push/payload/MDRDevice/MDRUDIDIData[1]/productionIdentifier: BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE
+  Push/payload/MDRDevice/MDRUDIDIData[1]/referenceNumber: "05993029999910"
+  Push/payload/MDRDevice/MDRUDIDIData[1]/sterile: true
+  Push/payload/MDRDevice/MDRUDIDIData[1]/sterilization: false
+  Push/payload/MDRDevice/MDRUDIDIData[1]/numberOfReuses: 0
+  Push/payload/MDRDevice/MDRUDIDIData[1]/marketInfos/marketInfo[0]/country: HU
+  Push/payload/MDRDevice/MDRUDIDIData[1]/marketInfos/marketInfo[0]/originalPlacedOnTheMarket: true
+  Push/payload/MDRDevice/MDRUDIDIData[1]/baseQuantity: 1
+  Push/payload/MDRDevice/MDRUDIDIData[1]/latex: false
+  Push/payload/MDRDevice/MDRUDIDIData[1]/reprocessed: false
+  Push/payload/MDRDevice/MDRUDIDIData[1]/website: https://medicontur.com/professionals/documents/eifus
+  Push/payload/MDRDevice/MDRUDIDIData[1]/storageHandlingConditions/condition[0]/storageHandlingConditionValue: SHC006
+  Push/payload/MDRDevice/MDRUDIDIData[1]/storageHandlingConditions/condition[0]/comments/name[0]/textValue: 15
+  Push/payload/MDRDevice/MDRUDIDIData[1]/storageHandlingConditions/condition[1]/storageHandlingConditionValue: SHC007
+  Push/payload/MDRDevice/MDRUDIDIData[1]/storageHandlingConditions/condition[1]/comments/name[0]/textValue: 30
+  Push/payload/MDRDevice/MDRUDIDIData[1]/criticalWarnings/warning[0]/warningValue: CW010
+  Push/payload/MDRDevice/MDRUDIDIData[1]/criticalWarnings/warning[0]/comments/name[0]/language: ANY
+  Push/payload/MDRDevice/MDRUDIDIData[1]/criticalWarnings/warning[0]/comments/name[0]/textValue: "Consult instructions for use"
+  Push/payload/MDRDevice/MDRUDIDIData[1]/criticalWarnings/warning[1]/warningValue: CW010
+  Push/payload/MDRDevice/MDRUDIDIData[1]/criticalWarnings/warning[1]/comments/name[0]/language: EN
+  Push/payload/MDRDevice/MDRUDIDIData[1]/criticalWarnings/warning[1]/comments/name[0]/textValue: "The IOL should not be used in: Zonular damage larger than 4 clock hours; Children under the age of one year; Chronic uveitis; Progressive eye disease (e.g. diabetic retinopathy, uncontrolled glaucoma); In case of preoperative complications prior to cataract surgery (e.g. vitrous body prolapse, haemorrhage); Patients with perforated or damaged capsules"
+  Push/payload/MDRDevice/MDRUDIDIData[1]/criticalWarnings/warning[1]/comments/name[1]/language: HU
+  Push/payload/MDRDevice/MDRUDIDIData[1]/criticalWarnings/warning[1]/comments/name[1]/textValue: "Az IOL nem alkalmazható az alábbi esetekben: 4 óránál kiterjedtebb zonuláris sérülés; Egy év alatti gyermekek; Krónikus uveitisz; Progresszív szembetegség (pl. diabéteszes retinopátia, nem kontrollált glaukóma); Szürkehályog-műtétet megelőző komplikációk esetén (pl. üvegtest-előesés, vérzés); Perforált vagy sérült kapszulával rendelkező betegek"
+
+  Push/payload/MDRDevice/MDRUDIDIData[2]/version: 2
+  Push/payload/MDRDevice/MDRUDIDIData[2]/identifier/DICode: "05993029999927"
+  Push/payload/MDRDevice/MDRUDIDIData[2]/identifier/issuingEntityCode: GS1
+  Push/payload/MDRDevice/MDRUDIDIData[2]/status/code: ON_THE_MARKET
+  Push/payload/MDRDevice/MDRUDIDIData[2]/basicUDIIdentifier/DICode: "599302877PAXU7"
+  Push/payload/MDRDevice/MDRUDIDIData[2]/basicUDIIdentifier/issuingEntityCode: GS1
+  Push/payload/MDRDevice/MDRUDIDIData[2]/MDNCodes: P030102090201
+  Push/payload/MDRDevice/MDRUDIDIData[2]/productionIdentifier: BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE
+  Push/payload/MDRDevice/MDRUDIDIData[2]/referenceNumber: "05993029999927"
+  Push/payload/MDRDevice/MDRUDIDIData[2]/sterile: true
+  Push/payload/MDRDevice/MDRUDIDIData[2]/sterilization: false
+  Push/payload/MDRDevice/MDRUDIDIData[2]/numberOfReuses: 0
+  Push/payload/MDRDevice/MDRUDIDIData[2]/marketInfos/marketInfo[0]/country: HU
+  Push/payload/MDRDevice/MDRUDIDIData[2]/marketInfos/marketInfo[0]/originalPlacedOnTheMarket: true
+  Push/payload/MDRDevice/MDRUDIDIData[2]/baseQuantity: 1
+  Push/payload/MDRDevice/MDRUDIDIData[2]/latex: false
+  Push/payload/MDRDevice/MDRUDIDIData[2]/reprocessed: false
+  Push/payload/MDRDevice/MDRUDIDIData[2]/website: https://medicontur.com/professionals/documents/eifus
+  Push/payload/MDRDevice/MDRUDIDIData[2]/storageHandlingConditions/condition[0]/storageHandlingConditionValue: SHC006
+  Push/payload/MDRDevice/MDRUDIDIData[2]/storageHandlingConditions/condition[0]/comments/name[0]/textValue: 15
+  Push/payload/MDRDevice/MDRUDIDIData[2]/storageHandlingConditions/condition[1]/storageHandlingConditionValue: SHC007
+  Push/payload/MDRDevice/MDRUDIDIData[2]/storageHandlingConditions/condition[1]/comments/name[0]/textValue: 30
+  Push/payload/MDRDevice/MDRUDIDIData[2]/criticalWarnings/warning[0]/warningValue: CW010
+  Push/payload/MDRDevice/MDRUDIDIData[2]/criticalWarnings/warning[0]/comments/name[0]/language: ANY
+  Push/payload/MDRDevice/MDRUDIDIData[2]/criticalWarnings/warning[0]/comments/name[0]/textValue: "Consult instructions for use"
+  Push/payload/MDRDevice/MDRUDIDIData[2]/criticalWarnings/warning[1]/warningValue: CW010
+  Push/payload/MDRDevice/MDRUDIDIData[2]/criticalWarnings/warning[1]/comments/name[0]/language: EN
+  Push/payload/MDRDevice/MDRUDIDIData[2]/criticalWarnings/warning[1]/comments/name[0]/textValue: "The IOL should not be used in: Zonular damage larger than 4 clock hours; Children under the age of one year; Chronic uveitis; Progressive eye disease (e.g. diabetic retinopathy, uncontrolled glaucoma); In case of preoperative complications prior to cataract surgery (e.g. vitrous body prolapse, haemorrhage); Patients with perforated or damaged capsules"
+  Push/payload/MDRDevice/MDRUDIDIData[2]/criticalWarnings/warning[1]/comments/name[1]/language: HU
+  Push/payload/MDRDevice/MDRUDIDIData[2]/criticalWarnings/warning[1]/comments/name[1]/textValue: "Az IOL nem alkalmazható az alábbi esetekben: 4 óránál kiterjedtebb zonuláris sérülés; Egy év alatti gyermekek; Krónikus uveitisz; Progresszív szembetegség (pl. diabéteszes retinopátia, nem kontrollált glaukóma); Szürkehályog-műtétet megelőző komplikációk esetén (pl. üvegtest-előesés, vérzés); Perforált vagy sérült kapszulával rendelkező betegek"
+
 

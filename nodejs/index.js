@@ -93,8 +93,59 @@ async function main() {
          }
     }
     const configRaw = yaml.load(fs.readFileSync(options.config, 'utf8'));
-    const config = configRaw.defaults || {};
+    let config = configRaw.defaults || {};
     
+    // --- UDI-DI FILTERING LOGIC ---
+    // Rule:
+    // - DEVICE/POST: Only the lowest DICode entry is included (XSD maxOccurs=1).
+    // - UDI_DI/POST: All entries EXCEPT the lowest DICode (adding secondary ones).
+    // - UDI_DI/PATCH: All entries.
+    const udiKeys = Object.keys(config).filter(k => k.startsWith('Push/payload/MDRDevice/MDRUDIDIData'));
+    if (udiKeys.length > 0) {
+        const udiGroups = {};
+        udiKeys.forEach(k => {
+            const match = k.match(/MDRUDIDIData(?:\[(\d+)\])?/);
+            const index = match[1] !== undefined ? parseInt(match[1]) : 0;
+            if (!udiGroups[index]) udiGroups[index] = {};
+            udiGroups[index][k] = config[k];
+        });
+
+        const sortedIndices = Object.keys(udiGroups).sort((a, b) => {
+            const diAKey = Object.keys(udiGroups[a]).find(k => k.endsWith('/identifier/DICode'));
+            const diBKey = Object.keys(udiGroups[b]).find(k => k.endsWith('/identifier/DICode'));
+            const valA = udiGroups[a][diAKey] || "";
+            const valB = udiGroups[b][diBKey] || "";
+            return valA.localeCompare(valB);
+        });
+
+        const lowestIndex = sortedIndices[0];
+        let selectedIndices = [];
+
+        if (options.type === 'DEVICE' && options.mode === 'POST') {
+            selectedIndices = [lowestIndex];
+        } else if (options.type === 'UDI_DI' && options.mode === 'POST') {
+            selectedIndices = sortedIndices.filter(idx => idx !== lowestIndex);
+        } else if (options.type === 'UDI_DI' || options.type === 'BASIC_UDI') {
+            selectedIndices = sortedIndices;
+        }
+
+        if (selectedIndices.length > 0 || udiKeys.length > 0) {
+            const filteredConfig = { ...config };
+            udiKeys.forEach(k => delete filteredConfig[k]);
+            
+            selectedIndices.forEach((oldIdx, newIdx) => {
+                const group = udiGroups[oldIdx];
+                Object.keys(group).forEach(oldKey => {
+                    const newKey = oldKey.replace(/MDRUDIDIData(?:\[\d+\])?/, `MDRUDIDIData[${newIdx}]`);
+                    filteredConfig[newKey] = group[oldKey];
+                });
+            });
+            config = filteredConfig;
+            console.log(`Filtered UDI-DIs: Selected ${selectedIndices.length} out of ${sortedIndices.length} available.`);
+
+        }
+    }
+
     // Auto-generate unique identifiers if missing in the YAML
     if (!config['Push/messageID']) config['Push/messageID'] = crypto.randomUUID();
     if (!config['Push/correlationID']) config['Push/correlationID'] = crypto.randomUUID();
@@ -144,19 +195,31 @@ async function main() {
 
     try {
         let xmlObj = null;
-        
-        // Target specific payload fragments based on the EUDAMED service type
         const serviceID = options.type;
 
-        if (serviceID === 'BASIC_UDI') {
-             // Generate MDRBasicUDI fragment and override type to allow patching
-             xmlObj = currentGenerator.generate('BasicUDI', 'Push/payload/MDRDevice/MDRBasicUDI', null, 'basicudi:MDRBasicUDIType');
-        } else if (serviceID === 'UDI_DI') {
-             // Generate MDRUDIDIData fragment
-             xmlObj = currentGenerator.generate('UDIDIData', 'Push/payload/MDRDevice/MDRUDIDIData', null, 'udidi:MDRUDIDIDataType');
-        } else if (serviceID === 'DEVICE') {
+        if (serviceID === 'DEVICE') {
              // Generate full Push message (Bulk registration)
              xmlObj = currentGenerator.generate('Push', 'Push');
+        } else if (serviceID === 'UDI_DI') {
+             // Generate array of MDRUDIDIData fragments under a single device:UDIDIData key
+             const udiDataKeys = Object.keys(config).filter(k => k.includes('MDRUDIDIData['));
+             const indices = [...new Set(udiDataKeys.map(k => k.match(/MDRUDIDIData\[(\d+)\]/)[1]))].sort();
+             
+             if (indices.length > 0) {
+                 const fragments = indices.map(idx => {
+                     const path = `Push/payload/MDRDevice/MDRUDIDIData[${idx}]`;
+                     const frag = currentGenerator.generate('UDIDIData', path, null, 'udidi:MDRUDIDIDataType');
+                     // frag is { 'device:UDIDIData': { ... } }
+                     return frag ? frag['device:UDIDIData'] : null;
+                 }).filter(Boolean);
+                 
+                 xmlObj = { 
+                     'device:UDIDIData': fragments 
+                 };
+             }
+        } else if (serviceID === 'BASIC_UDI') {
+             // Generate MDRBasicUDI fragment
+             xmlObj = currentGenerator.generate('BasicUDI', 'Push/payload/MDRDevice/MDRBasicUDI', null, 'basicudi:MDRBasicUDIType');
         }
         
         // 5. WRAPPING (for fragmentary payloads)
@@ -314,8 +377,12 @@ async function main() {
                     // EUDAMED XSD requires elements in a specific order (base before extension).
                     // This logic maintains the correct sequence for UDI types.
                     if (key.endsWith('BasicUDI') || key.endsWith('UDIDIData')) {
-                        const udi = obj[key];
-                        if (udi && typeof udi === 'object') {
+                        const val = obj[key];
+                        const items = Array.isArray(val) ? val : [val];
+                        
+                        const fixedItems = items.map(udi => {
+                            if (!udi || typeof udi !== 'object') return udi;
+                            
                             const newUdi = {};
                             let correctOrder = [];
 
@@ -362,11 +429,12 @@ async function main() {
                             
                             // Append any remaining/dynamic properties (e.g., xsi:type)
                             Object.assign(newUdi, udi);
-                            obj[key] = newUdi;
-                            
                             recursiveFix(newUdi);
-                            return;
-                        }
+                            return newUdi;
+                        });
+                        
+                        obj[key] = Array.isArray(val) ? fixedItems : fixedItems[0];
+                        return;
                     }
                     
                     // Recursive call for nested structures

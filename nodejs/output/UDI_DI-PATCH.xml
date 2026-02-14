@@ -1,7 +1,7 @@
 <m:Push version="3.0.25" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:m="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Message/v1" xmlns:s="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Service/v1" xmlns:actorregistration="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Actor/Registration/v1" xmlns:actor="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Actor/v1" xmlns:device="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/v1" xmlns:mktinfo="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MktInfo/v1" xmlns:pd="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/ProcedureDevice/v1" xmlns:sscp="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/SSCP/v1" xmlns:cecp="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Certificate/Cecp/v1" xmlns:certificate="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Certificate/IssuedCertificate/v1" xmlns:appcrtf="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Certificate/ApplicationCertificate/v1" xmlns:msuFir="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/FIRVersionType/v1" xmlns:msuAsr="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/AnnualSummaryReport/v1" xmlns:msuFyr="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/FourYearReport/v1" xmlns:procdt="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/ProcedureData/v1" xmlns:vigbase="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Vigilance" xmlns:ocm="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/OCM/OldCustomMadeDevice/v1" xmlns:e="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/v1" xmlns:doct="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/Document/v1" xmlns:commondi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/CommonDevice/v1" xmlns:commonbasic="https://ec.europa.eu/tools/eudamed/dtx/datamodel/CommonBasic/v1" xmlns:lsn="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/LanguageSpecific/v1" xmlns:crtfissued="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Certificate/IssuedCertificate/v1" xmlns:udidi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/UDIDI/v1" xmlns:marketinfo="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MktInfo/MarketInfo/v1" xmlns:links="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Links/v1" xmlns:party="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Party/v1" xmlns:address="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Party/Address/v1" xmlns:country="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/Country/v1" xmlns:basicudi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/BasicUDI/v1" xmlns:dt="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/Decision/v1" xmlns:comment="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/Comment/v1" xmlns:risk="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/RiskClass/v1" xmlns:crtfdecisionupdate="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Certificate/CertificateDecisionUpdate/v1" xmlns:crtf="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Certificate/v1" xmlns:crtfscp="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Certificate/Scope/v1" xmlns:actorrel="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Actor/Relationship/v1" xmlns:riskclass="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/RiskClass/v1" xmlns:crtfcecp="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Certificate/Cecp/v1" xmlns:eudi="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/LegacyDevice/EUDI/v1" xmlns:eudididata="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/LegacyDevice/EUDIData/v1" xmlns:service="https://ec.europa.eu/tools/eudamed/dtx/servicemodel/Service/v1" xmlns:proc="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/Procedure/v1" xmlns:legislation="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/Legislation/v1" xmlns:vig="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Vigilance" xmlns:addInfo="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/AdditionalInfo/v1" xmlns:mea="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/Measure/v1" xmlns:coa="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/CorrectiveAction/v1" xmlns:eo="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Msu/MSUEconomicOperatorType/v1" xmlns:vd="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Msu/VersionDataType/v1" xmlns:measure="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/Measure/v1" xmlns:objct="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/Measure/Objection/v1" xmlns:precondition="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/Measure/Precondition/v1" xmlns:measureType="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/Measure/MeasureType/v1" xmlns:precond="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/Measure/Precondition/v1" xmlns:coaType="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/CorrectiveAction/CorrectiveActionType/v1" xmlns:vigReport="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/CorrectiveAction/VigilanceReport/v1" xmlns:affectedCountry="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/AffectedCountry/v1" xmlns:addinfo="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MsuProcedures/AdditionalInfo/v1" xmlns:eoRole="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/EORoleEnum/v1" xmlns:r="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/ReportDataType/v1" xmlns:fir="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/FIRVersionType/v1" xmlns:eoType="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Msu/MSUEconomicOperatorType/v1" xmlns:rd="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/ReportDocumentType/v1" xmlns:rtype="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/MsuReportTypeEnum/v1" xmlns:asr="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/AnnualSummaryReport/v1" xmlns:msufyr="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Reports/FourYearReport/v1" xmlns:cb="https://ec.europa.eu/tools/eudamed/dtx/datamodel/CommonBasic/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <m:correlationID>fb2d1d28-97c6-4008-a251-da469f8ce61b</m:correlationID>
-  <m:creationDateTime>2026-02-14T16:54:53.877Z</m:creationDateTime>
-  <m:messageID>35b36fc2-7a72-454d-b58f-e040676cd9ae</m:messageID>
+  <m:correlationID>9aa0758d-bf67-4bc0-8718-9a05a2f5a4b0</m:correlationID>
+  <m:creationDateTime>2026-02-14T19:54:47.764Z</m:creationDateTime>
+  <m:messageID>268c568d-d5fb-4a19-8630-67f5053790db</m:messageID>
   <m:recipient>
     <m:node>
       <s:nodeActorCode>EUDAMED</s:nodeActorCode>
@@ -36,7 +36,7 @@
         <commondi:condition>
           <commondi:comments>
             <lsn:name>
-              <lsn:textValue>10</lsn:textValue>
+              <lsn:textValue>15</lsn:textValue>
             </lsn:name>
           </commondi:comments>
           <commondi:storageHandlingConditionValue>SHC006</commondi:storageHandlingConditionValue>
@@ -44,7 +44,7 @@
         <commondi:condition>
           <commondi:comments>
             <lsn:name>
-              <lsn:textValue>25</lsn:textValue>
+              <lsn:textValue>30</lsn:textValue>
             </lsn:name>
           </commondi:comments>
           <commondi:storageHandlingConditionValue>SHC007</commondi:storageHandlingConditionValue>
@@ -71,7 +71,151 @@
               <lsn:textValue>Az IOL nem alkalmazható az alábbi esetekben: 4 óránál kiterjedtebb zonuláris sérülés; Egy év alatti gyermekek; Krónikus uveitisz; Progresszív szembetegség (pl. diabéteszes retinopátia, nem kontrollált glaukóma); Szürkehályog-műtétet megelőző komplikációk esetén (pl. üvegtest-előesés, vérzés); Perforált vagy sérült kapszulával rendelkező betegek</lsn:textValue>
             </lsn:name>
           </commondi:comments>
-          <commondi:warningValue>CW999</commondi:warningValue>
+          <commondi:warningValue>CW010</commondi:warningValue>
+        </commondi:warning>
+      </udidi:criticalWarnings>
+      <udidi:numberOfReuses>0</udidi:numberOfReuses>
+      <udidi:marketInfos>
+        <marketinfo:marketInfo>
+          <marketinfo:country>HU</marketinfo:country>
+          <marketinfo:originalPlacedOnTheMarket>true</marketinfo:originalPlacedOnTheMarket>
+        </marketinfo:marketInfo>
+      </udidi:marketInfos>
+      <udidi:baseQuantity>1</udidi:baseQuantity>
+      <udidi:latex>false</udidi:latex>
+      <udidi:reprocessed>false</udidi:reprocessed>
+    </device:UDIDIData>
+    <device:UDIDIData xsi:type="udidi:MDRUDIDIDataType">
+      <e:version>2</e:version>
+      <udidi:identifier>
+        <commondi:DICode>05993029999910</commondi:DICode>
+        <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
+      </udidi:identifier>
+      <udidi:status>
+        <commondi:code>ON_THE_MARKET</commondi:code>
+      </udidi:status>
+      <udidi:basicUDIIdentifier>
+        <commondi:DICode>599302877PAXU7</commondi:DICode>
+        <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
+      </udidi:basicUDIIdentifier>
+      <udidi:MDNCodes>P030102090201</udidi:MDNCodes>
+      <udidi:productionIdentifier>BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE</udidi:productionIdentifier>
+      <udidi:referenceNumber>05993029999910</udidi:referenceNumber>
+      <udidi:sterile>true</udidi:sterile>
+      <udidi:sterilization>false</udidi:sterilization>
+      <udidi:website>https://medicontur.com/professionals/documents/eifus</udidi:website>
+      <udidi:storageHandlingConditions>
+        <commondi:condition>
+          <commondi:comments>
+            <lsn:name>
+              <lsn:textValue>15</lsn:textValue>
+            </lsn:name>
+          </commondi:comments>
+          <commondi:storageHandlingConditionValue>SHC006</commondi:storageHandlingConditionValue>
+        </commondi:condition>
+        <commondi:condition>
+          <commondi:comments>
+            <lsn:name>
+              <lsn:textValue>30</lsn:textValue>
+            </lsn:name>
+          </commondi:comments>
+          <commondi:storageHandlingConditionValue>SHC007</commondi:storageHandlingConditionValue>
+        </commondi:condition>
+      </udidi:storageHandlingConditions>
+      <udidi:criticalWarnings>
+        <commondi:warning>
+          <commondi:comments>
+            <lsn:name>
+              <lsn:language>ANY</lsn:language>
+              <lsn:textValue>Consult instructions for use</lsn:textValue>
+            </lsn:name>
+          </commondi:comments>
+          <commondi:warningValue>CW010</commondi:warningValue>
+        </commondi:warning>
+        <commondi:warning>
+          <commondi:comments>
+            <lsn:name>
+              <lsn:language>EN</lsn:language>
+              <lsn:textValue>The IOL should not be used in: Zonular damage larger than 4 clock hours; Children under the age of one year; Chronic uveitis; Progressive eye disease (e.g. diabetic retinopathy, uncontrolled glaucoma); In case of preoperative complications prior to cataract surgery (e.g. vitrous body prolapse, haemorrhage); Patients with perforated or damaged capsules</lsn:textValue>
+            </lsn:name>
+            <lsn:name>
+              <lsn:language>HU</lsn:language>
+              <lsn:textValue>Az IOL nem alkalmazható az alábbi esetekben: 4 óránál kiterjedtebb zonuláris sérülés; Egy év alatti gyermekek; Krónikus uveitisz; Progresszív szembetegség (pl. diabéteszes retinopátia, nem kontrollált glaukóma); Szürkehályog-műtétet megelőző komplikációk esetén (pl. üvegtest-előesés, vérzés); Perforált vagy sérült kapszulával rendelkező betegek</lsn:textValue>
+            </lsn:name>
+          </commondi:comments>
+          <commondi:warningValue>CW010</commondi:warningValue>
+        </commondi:warning>
+      </udidi:criticalWarnings>
+      <udidi:numberOfReuses>0</udidi:numberOfReuses>
+      <udidi:marketInfos>
+        <marketinfo:marketInfo>
+          <marketinfo:country>HU</marketinfo:country>
+          <marketinfo:originalPlacedOnTheMarket>true</marketinfo:originalPlacedOnTheMarket>
+        </marketinfo:marketInfo>
+      </udidi:marketInfos>
+      <udidi:baseQuantity>1</udidi:baseQuantity>
+      <udidi:latex>false</udidi:latex>
+      <udidi:reprocessed>false</udidi:reprocessed>
+    </device:UDIDIData>
+    <device:UDIDIData xsi:type="udidi:MDRUDIDIDataType">
+      <e:version>2</e:version>
+      <udidi:identifier>
+        <commondi:DICode>05993029999927</commondi:DICode>
+        <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
+      </udidi:identifier>
+      <udidi:status>
+        <commondi:code>ON_THE_MARKET</commondi:code>
+      </udidi:status>
+      <udidi:basicUDIIdentifier>
+        <commondi:DICode>599302877PAXU7</commondi:DICode>
+        <commondi:issuingEntityCode>GS1</commondi:issuingEntityCode>
+      </udidi:basicUDIIdentifier>
+      <udidi:MDNCodes>P030102090201</udidi:MDNCodes>
+      <udidi:productionIdentifier>BATCH_NUMBER SERIALISATION_NUMBER EXPIRATION_DATE</udidi:productionIdentifier>
+      <udidi:referenceNumber>05993029999927</udidi:referenceNumber>
+      <udidi:sterile>true</udidi:sterile>
+      <udidi:sterilization>false</udidi:sterilization>
+      <udidi:website>https://medicontur.com/professionals/documents/eifus</udidi:website>
+      <udidi:storageHandlingConditions>
+        <commondi:condition>
+          <commondi:comments>
+            <lsn:name>
+              <lsn:textValue>15</lsn:textValue>
+            </lsn:name>
+          </commondi:comments>
+          <commondi:storageHandlingConditionValue>SHC006</commondi:storageHandlingConditionValue>
+        </commondi:condition>
+        <commondi:condition>
+          <commondi:comments>
+            <lsn:name>
+              <lsn:textValue>30</lsn:textValue>
+            </lsn:name>
+          </commondi:comments>
+          <commondi:storageHandlingConditionValue>SHC007</commondi:storageHandlingConditionValue>
+        </commondi:condition>
+      </udidi:storageHandlingConditions>
+      <udidi:criticalWarnings>
+        <commondi:warning>
+          <commondi:comments>
+            <lsn:name>
+              <lsn:language>ANY</lsn:language>
+              <lsn:textValue>Consult instructions for use</lsn:textValue>
+            </lsn:name>
+          </commondi:comments>
+          <commondi:warningValue>CW010</commondi:warningValue>
+        </commondi:warning>
+        <commondi:warning>
+          <commondi:comments>
+            <lsn:name>
+              <lsn:language>EN</lsn:language>
+              <lsn:textValue>The IOL should not be used in: Zonular damage larger than 4 clock hours; Children under the age of one year; Chronic uveitis; Progressive eye disease (e.g. diabetic retinopathy, uncontrolled glaucoma); In case of preoperative complications prior to cataract surgery (e.g. vitrous body prolapse, haemorrhage); Patients with perforated or damaged capsules</lsn:textValue>
+            </lsn:name>
+            <lsn:name>
+              <lsn:language>HU</lsn:language>
+              <lsn:textValue>Az IOL nem alkalmazható az alábbi esetekben: 4 óránál kiterjedtebb zonuláris sérülés; Egy év alatti gyermekek; Krónikus uveitisz; Progresszív szembetegség (pl. diabéteszes retinopátia, nem kontrollált glaukóma); Szürkehályog-műtétet megelőző komplikációk esetén (pl. üvegtest-előesés, vérzés); Perforált vagy sérült kapszulával rendelkező betegek</lsn:textValue>
+            </lsn:name>
+          </commondi:comments>
+          <commondi:warningValue>CW010</commondi:warningValue>
         </commondi:warning>
       </udidi:criticalWarnings>
       <udidi:numberOfReuses>0</udidi:numberOfReuses>

@@ -22,7 +22,7 @@ class XMLGenerator {
         this.config = config;
         this.nsMap = nsMap;
         this.substitutions = substitutions;
-        this.debug = true;
+        this.debug = false;
     }
 
     /**
@@ -240,7 +240,13 @@ class XMLGenerator {
                         return;
                     }
                 }
-                elName = elementDef['@_name'];
+
+                // Substitution check: If the element is abstract or redirected, use the substituted name
+                if (this.substitutions[ref]) {
+                    elName = this.substitutions[ref].split(':').pop(); 
+                } else {
+                    elName = elementDef['@_name'];
+                }
             }
             
             if (!elName) return;
@@ -253,9 +259,9 @@ class XMLGenerator {
             const prefix = this.getPrefix(ns);
             const key = prefix ? `${prefix}:${elName}` : elName;
 
-            const maxOccurs = el['@_maxOccurs'];
+            const maxOccurs = el['@_maxOccurs'] || "1";
             const isArray = maxOccurs === 'unbounded' || parseInt(maxOccurs) > 1;
-            
+
             if (isArray) {
                 const items = [];
                 let idx = 0;
@@ -289,7 +295,11 @@ class XMLGenerator {
                 if (items.length > 0) result[key] = items;
                 
             } else {
-                const childPath = `${currentPath}/${elName}`;
+                let childPath = `${currentPath}/${elName}`;
+                // Reverse Fallback: If XSD says single element, but config has it as an array of 1 (common in our refactored YAMLs)
+                if (this.hasConfigPrefix(childPath + '[0]')) {
+                    childPath = childPath + '[0]';
+                }
                 const childContent = this.processElement(elementDef, childPath, filterPath);
                 if (childContent !== null) {
                     result[key] = childContent;
