@@ -192,6 +192,11 @@ class XMLGenerator {
             if (ref && this.substitutions[ref]) {
                  console.log(`Substituting ${ref} -> ${this.substitutions[ref]}`);
                  ref = this.substitutions[ref];
+                 
+                 // If substitution is a simple name (no prefix), might need lookup in same context or global
+                 if (!ref.includes(':') && !this.ctx.getElement(ref) && this.ctx.types[ref]) {
+                     // Sometimes substitution targets a TYPE? No, element substitution targets ELEMENT.
+                 }
             }
 
             let elementDef = el;
@@ -205,7 +210,10 @@ class XMLGenerator {
                          const local = parts[1];
                          elementDef = this.ctx.getElement(local);
                     }
-                    if (!elementDef) return;
+                    if (!elementDef) {
+                        console.warn(`Definition not found for ref: ${ref}`); // Added Debug
+                        return;
+                    }
                 }
                 elName = elementDef['@_name'];
             }

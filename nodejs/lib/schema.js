@@ -108,6 +108,27 @@ class SchemaContext {
         });
     }
 
+    getNamespaces() {
+        // Collect all xmlns attributes from all loaded schemas
+        let namespaces = {};
+        
+        // Ensure schemas dictionary is initialized
+        if (!this.schemas) return {};
+        
+        Object.values(this.schemas).forEach(schemaRoot => {
+            if (!schemaRoot) return;
+            Object.keys(schemaRoot).forEach(key => {
+                // If fast-xml-parser 'attributeNamePrefix' is '@_' and 'ignoreAttributes' is false
+                if (key.startsWith('@_xmlns:')) {
+                    const prefix = key.substring(8); // Remove '@_xmlns:'
+                    namespaces[prefix] = schemaRoot[key];
+                }
+            });
+        });
+        
+        return namespaces;
+    }
+
     ensureArray(root, keySuffix) {
         // keySuffix might be 'element', but in JSON it could be 'xs:element'
         const keys = Object.keys(root);
